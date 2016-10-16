@@ -10,3 +10,9 @@
 \.config
 \.launches
 *.db
+*.log
+libs/piLibsExamples/example_01/bin/Win32/Debug/example_01.tlog/CL.command.1.tlog
+*.tlog
+libs/piLibsExamples/example_01/example_01_2013.vcxproj
+*.pdb
+libs/piLibsExamples/example_01/example_01_2013.vcxproj
