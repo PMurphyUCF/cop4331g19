@@ -3,15 +3,19 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.util.Enumeration;
 
 import javax.swing.*;
 
 public class ArtGUI extends JApplet implements ActionListener {
 
 	//false when not recording, true when recording
-	boolean recordState;
-	JButton recordInput, saveImage;
-	JSlider slider;
+	boolean recordState = false;
+	public static JButton recordInput, saveImage;
+	public static JSlider slider;
+	private ButtonGroup algorithmOption, modeOption;
+	private JRadioButton staticImage, realImage, algo1, algo2, algo3, algo4;
+	private AudioModule module;
 	
 	public void init(){
 		recordState = false;
@@ -39,14 +43,14 @@ public class ArtGUI extends JApplet implements ActionListener {
         westPanel.setBorder(BorderFactory.createTitledBorder("Select Style"));
         add(westPanel,BorderLayout.WEST);
         
-        ButtonGroup algorithmOption = new ButtonGroup();
-        JRadioButton algo1 = new JRadioButton("Algorithm 1");
+        algorithmOption = new ButtonGroup();
+        algo1 = new JRadioButton("Algorithm 1");
         algo1.setFont(new Font(Font.DIALOG,Font.PLAIN,24));
-        JRadioButton algo2 = new JRadioButton("Algorithm 2");
+        algo2 = new JRadioButton("Algorithm 2");
         algo2.setFont(new Font(Font.DIALOG,Font.PLAIN,24));
-        JRadioButton algo3 = new JRadioButton("Algorithm 3");
+        algo3 = new JRadioButton("Algorithm 3");
         algo3.setFont(new Font(Font.DIALOG,Font.PLAIN,24));
-        JRadioButton algo4 = new JRadioButton("Algorithm 4");
+        algo4 = new JRadioButton("Algorithm 4");
         algo4.setFont(new Font(Font.DIALOG,Font.PLAIN,24));
         
         algorithmOption.add(algo1);
@@ -90,9 +94,9 @@ public class ArtGUI extends JApplet implements ActionListener {
 		recordInput.addActionListener(this);
 		top.add(recordInput);
         
-        ButtonGroup modeOption = new ButtonGroup();
-        JRadioButton staticImage = new JRadioButton("Static Image");
-        JRadioButton realImage = new JRadioButton("Real Time Image");
+        modeOption = new ButtonGroup();
+        staticImage = new JRadioButton("Static Image");
+        realImage = new JRadioButton("Real Time Image");
         modeOption.add(staticImage);
         modeOption.add(realImage);
 
@@ -155,25 +159,46 @@ public class ArtGUI extends JApplet implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		switch (e.getActionCommand()) {
 			case "recordInput":
-				recordState = !recordState;
+				int mode;
+				if (!recordState) {
 
-				if (recordState) {
-					recordInput.setText("Stop Recording");
-					//start the recording
-					//need to get chosen algorithm
-					int chosenAlgo = 1;
-					AudioModule module = new AudioModule(chosenAlgo);
-					//need to get slider position
-					int sliderPos = 4;
+					if (getSelectedButtonText(algorithmOption).equals("")) {
+						infoBox("Please select an Algorithm", "Unable to Proceed");
+						return;
+					}
+
+					switch(getSelectedButtonText(modeOption)) {
+						case "Real Time Image":
+							recordInput.setText("Stop Recording");
+							recordState = true;
+							mode = 2;
+							break;
+						case "Static Image":
+							mode = 1;
+							break;
+						default:
+							infoBox("Please select a mode of operation", "Unable to Proceed");
+							return;
+					}
+
 					try {
-						module.runAudioModule(sliderPos);
+						//need to get slider position
+						int sliderPos = slider.getValue();
+						//start the recording
+						module = new AudioModule(mode, sliderPos);
+						Thread audioThread = new Thread(module);
+						audioThread.start();
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
+
 				}
 				else {
 					recordInput.setText("Record Input");
+					recordState = false;
 					//stop the recording
+					module.recording = false;
+
 				}
 				break;
 			case "saveImage":
@@ -183,6 +208,23 @@ public class ArtGUI extends JApplet implements ActionListener {
 			default:
 				System.out.println(e.getActionCommand());
 		}
+	}
+
+	private String getSelectedButtonText(ButtonGroup buttonGroup) {
+		for (Enumeration<AbstractButton> buttons = buttonGroup.getElements(); buttons.hasMoreElements();) {
+			AbstractButton button = buttons.nextElement();
+
+			if (button.isSelected()) {
+				return button.getText();
+			}
+		}
+
+		return "";
+	}
+
+	public static void infoBox(String infoMessage, String titleBar)
+	{
+		JOptionPane.showMessageDialog(null, infoMessage, titleBar, JOptionPane.INFORMATION_MESSAGE);
 	}
 
 

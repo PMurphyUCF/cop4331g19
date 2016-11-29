@@ -5,16 +5,21 @@ import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 
 
-public class AudioModule {
+public class AudioModule implements Runnable {
 
-    int algoNum;
+    int modeOfOp, duration;
+    boolean recording = false;
 
-    AudioModule(int algoNum) {
-        this.algoNum = algoNum;
+    AudioModule(int modeOfOp, int duration) {
+        //sets the mode of operation, either static or real time
+        //1 for static, 2 for real time
+        this.modeOfOp = modeOfOp;
+        this.duration = duration;
+        this.recording = false;
     }
 
-    public void runAudioModule(int duration) throws Exception {
-
+    @Override
+    public void run() {
         //run it based on the algorithm number (algoNum)
 
         int limit;
@@ -26,6 +31,7 @@ public class AudioModule {
         DoubleFFT_1D dfft = new DoubleFFT_1D(limit);
         //getting the audio input in the form of a byte array
         byte[] audioInputBytes = getAudio(duration);
+
         //converting the byte array to a short array
         //converting it straight to a double array would not give correct data
         shorts = shortMe(audioInputBytes);
@@ -69,10 +75,33 @@ public class AudioModule {
             line.start();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buf = new byte[(int) af.getSampleRate() * af.getFrameSize()];
-            long end = System.currentTimeMillis() + 1000 * duration;
+            long end;
             int len;
-            while (System.currentTimeMillis() < end && ((len = line.read(buf, 0, buf.length)) != -1)) {
-                baos.write(buf, 0, len);
+            recording = true;
+            if (modeOfOp == 1) {
+                end = System.currentTimeMillis() + 1000 * duration;
+                ArtGUI.recordInput.setEnabled(false);
+                ArtGUI.slider.setEnabled(false);
+                while (System.currentTimeMillis() < end && ((len = line.read(buf, 0, buf.length)) != -1)) {
+                    baos.write(buf, 0, len);
+                }
+                ArtGUI.recordInput.setEnabled(true);
+                ArtGUI.slider.setEnabled(true);
+                recording = false;
+            }
+            else {
+                duration = 10;
+                end = System.currentTimeMillis() + 1000 * duration;
+                ArtGUI.slider.setEnabled(false);
+                while (recording && System.currentTimeMillis() < end && ((len = line.read(buf, 0, buf.length)) != -1)) {
+                    baos.write(buf, 0, len);
+                }
+                if (System.currentTimeMillis() >= end) {
+                    ArtGUI.recordInput.doClick();
+                    ArtGUI.infoBox("The max duration has been reached", "Recording Stopped");
+                }
+                ArtGUI.slider.setEnabled(true);
+                recording = false;
             }
             line.stop();
             line.close();
@@ -105,4 +134,5 @@ public class AudioModule {
         }
         return out;
     }
+
 }
