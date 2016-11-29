@@ -87,7 +87,8 @@ public class GLLoader {
 		glLoadIdentity();
 		glOrtho(0, 800, 0, 600, 1, -1);
 		glMatrixMode(GL_MODELVIEW);
-	        
+		//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );   wireframemode
+		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		// the window or has pressed the ESCAPE key.
 		while ( !glfwWindowShouldClose(window) ) {
 			draw();	
@@ -96,7 +97,7 @@ public class GLLoader {
 	
 	private void draw() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
-		//glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		int SIZE=32; 
 		int PADDING_HALF=1;	
 		//setColor(material);	
@@ -104,22 +105,25 @@ public class GLLoader {
 		int y=0;	
 		glDisable(GL_LIGHTING);
 		glDisable(GL_TEXTURE_2D);
-		glColor3f(0.5f,0.5f,1.0f);
 		for(int i=0;i<32;i++){
 			x++;
-			y++;
-	    glBegin(GL_QUADS);
-	        glVertex2i(SIZE*(x-1) + PADDING_HALF, SIZE*y     - PADDING_HALF); //top-left vertex
-	        glVertex2i(SIZE*x     - PADDING_HALF, SIZE*y     - PADDING_HALF); //top-right vertex
-	        glVertex2i(SIZE*(x-1) + PADDING_HALF, SIZE*(y-1) + PADDING_HALF); //bottom-left vertex
-	        glVertex2i(SIZE*x     - PADDING_HALF, SIZE*(y-1) + PADDING_HALF); //bottom-right vertex
-	    glEnd();
-	    glColor3f(0.5f,0.5f,1.0f);
+			y=0;
+			for(int k=0;k<32;k++){
+				y++;
+				glColor3f(1.0f,1.0f, 1.0f);
+				glBegin(GL_QUADS);
+		        glVertex2i(SIZE*(x-1) + PADDING_HALF, SIZE*(y-1) + PADDING_HALF); //bottom-left vertex
+		        glVertex2i(SIZE*x     - PADDING_HALF, SIZE*(y-1) + PADDING_HALF); //bottom-right vertex
+		        glVertex2i(SIZE*x     - PADDING_HALF, SIZE*y     - PADDING_HALF); //top-right vertex
+		        glVertex2i(SIZE*(x-1) + PADDING_HALF, SIZE*y     - PADDING_HALF); //top-left vertex
+		        glEnd();
+			}
 		}
 		glEnable(GL_LIGHTING);
 		glEnable(GL_TEXTURE_2D);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+			
 	}
 		
 	
