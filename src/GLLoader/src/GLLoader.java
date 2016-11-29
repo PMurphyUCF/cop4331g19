@@ -44,7 +44,7 @@ public class GLLoader {
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
-		int WIDTH = 600;
+		int WIDTH = 800;
 		int HEIGHT = 600;
 
 		// Create the window
@@ -71,7 +71,7 @@ public class GLLoader {
 		glfwMakeContextCurrent(window);
 		// Enable v-sync
 		glfwSwapInterval(1);
-
+	
 		// Make the window visible
 		glfwShowWindow(window);
 	}
@@ -83,16 +83,14 @@ public class GLLoader {
 		// creates the GLCapabilities instance and makes the OpenGL
 		// bindings available for use.
 		GL.createCapabilities();
-
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(0, 800, 0, 600, 1, -1);
+		glMatrixMode(GL_MODELVIEW);
 	        
 		// the window or has pressed the ESCAPE key.
 		while ( !glfwWindowShouldClose(window) ) {
 			draw();	
-			glfwSwapBuffers(window); // swap the color buffers
-
-			// Poll for window events. The key callback above will only be
-			// invoked during this call.
-			glfwPollEvents();
 		}
 	}
 	
@@ -103,7 +101,9 @@ public class GLLoader {
 		int PADDING_HALF=1;	
 		//setColor(material);	
 		int x=0;
-		int y=0;
+		int y=0;	
+		glDisable(GL_LIGHTING);
+		glDisable(GL_TEXTURE_2D);
 		glColor3f(0.5f,0.5f,1.0f);
 		for(int i=0;i<32;i++){
 			x++;
@@ -114,9 +114,12 @@ public class GLLoader {
 	        glVertex2i(SIZE*(x-1) + PADDING_HALF, SIZE*(y-1) + PADDING_HALF); //bottom-left vertex
 	        glVertex2i(SIZE*x     - PADDING_HALF, SIZE*(y-1) + PADDING_HALF); //bottom-right vertex
 	    glEnd();
-	    window.update();
+	    glColor3f(0.5f,0.5f,1.0f);
 		}
-	
+		glEnable(GL_LIGHTING);
+		glEnable(GL_TEXTURE_2D);
+		glfwSwapBuffers(window);
+		glfwPollEvents();
 	}
 		
 	
