@@ -1,8 +1,6 @@
 import java.applet.Applet;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.util.Enumeration;
 
 import javax.swing.*;
@@ -10,12 +8,13 @@ import javax.swing.*;
 public class ArtGUI extends JApplet implements ActionListener {
 
 	//false when not recording, true when recording
-	boolean recordState = false;
+	public static boolean recordState = false;
 	public static JButton recordInput, saveImage;
 	public static JSlider slider;
 	private ButtonGroup algorithmOption, modeOption, resolutionOption;
 	static JRadioButton staticImage, realImage, algo1, algo2, algo3, algo4, reso1, reso2, reso3, reso4;
 	private AudioModule module;
+	private Thread audioThread;
 	private JPanel centerPanel;
 	
 	public void main(String[] args) {
@@ -24,6 +23,7 @@ public class ArtGUI extends JApplet implements ActionListener {
 	
 	public void init(){
 		recordState = false;
+		module = new AudioModule();
 
 		//setDefaultCloseOperation(JApplet.EXIT_ON_CLOSE);
 		setSize(770,550);
@@ -191,7 +191,6 @@ public class ArtGUI extends JApplet implements ActionListener {
 					switch(getSelectedButtonText(modeOption)) {
 						case "Real Time Image":
 							recordInput.setText("Stop Recording");
-							recordState = true;
 							mode = 2;
 							break;
 						case "Static Image":
@@ -204,9 +203,9 @@ public class ArtGUI extends JApplet implements ActionListener {
 
 					try {
 						//need to get slider position
-						int sliderPos = slider.getValue();
 						//start the recording
-						module = new AudioModule(mode, sliderPos);
+						module.modeOfOp = mode;
+						module.duration = slider.getValue();
 
 						switch (getSelectedButtonText(resolutionOption)) {
 							case "640x480":
@@ -251,19 +250,17 @@ public class ArtGUI extends JApplet implements ActionListener {
 								return;
 						}
 
-						Thread audioThread = new Thread(module);
+						audioThread = new Thread(module);
 						audioThread.start();
+						recordState = true;
 					} catch (Exception e1) {
 						e1.printStackTrace();
 					}
 
 				}
 				else {
-					recordInput.setText("Record Input");
-					recordState = false;
 					//stop the recording
 					module.recording = false;
-
 				}
 				break;
 			case "saveImage":

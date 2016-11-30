@@ -19,7 +19,7 @@ public class GLLoader implements Runnable{
 	private int windowW;
 	private int windowH;
 
-	public int width = 0, height = 0;
+	public int width = 0, height = 0, algo = 0, mode = 0;
 	public boolean fullscreen = false;
 	private volatile boolean running = true;
 	private quaddata storage[][];
@@ -145,8 +145,15 @@ public class GLLoader implements Runnable{
 		//setColor(material);	
 		glDisable(GL_LIGHTING);
 		glDisable(GL_TEXTURE_2D);
-		
-		double[] tmp = AudioModule.rtData;
+
+		double[] tmp;
+		if (mode == 1) {
+			tmp = AudioModule.staticData;
+		}
+		else {
+			tmp = AudioModule.rtData;
+		}
+
 		Random Random = new Random() ; 
 		for(int i=0;i<64;i++){
 			for(int k=0;k<32;k++){
@@ -258,7 +265,7 @@ public class GLLoader implements Runnable{
 			robot.mousePress(InputEvent.BUTTON1_MASK);
 			robot.mouseRelease(InputEvent.BUTTON1_MASK);
 
-			robot.delay(100);
+			robot.delay(50);
 
 			// Simulate a key press
 			robot.keyPress(KeyEvent.VK_ALT);
@@ -267,7 +274,7 @@ public class GLLoader implements Runnable{
 			robot.keyRelease(KeyEvent.VK_ALT);
 			robot.keyRelease(KeyEvent.VK_TAB);
 
-			robot.delay(100);
+			robot.delay(50);
 
 			robot.keyPress(KeyEvent.VK_ESCAPE);
 			robot.keyRelease(KeyEvent.VK_ESCAPE);

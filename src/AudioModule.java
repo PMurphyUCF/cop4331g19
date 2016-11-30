@@ -19,11 +19,13 @@ public class AudioModule implements Runnable {
     private long window;
     public static double[] rtData = new double[512];
     public static double[] staticData = new double[512];
-    AudioModule(int modeOfOp, int duration) {
-        //sets the mode of operation, either static or real time
-        //1 for static, 2 for real time
-        this.modeOfOp = modeOfOp;
-        this.duration = duration;
+    private GLLoader loader;
+    Thread loaderThread;
+    //used to check if there's a static window already open
+    public boolean alreadyRan = false;
+
+    AudioModule() {
+
         this.recording = false;
         AudioModule.LastDec = this;
     }
@@ -32,6 +34,20 @@ public class AudioModule implements Runnable {
     public void run() {
         //run it based on the algorithm number (algoNum)
 
+        if (modeOfOp == 2 && alreadyRan && loaderThread != null) {
+            loader.destroyWindow();
+            loader.terminate();
+            try {
+                loaderThread.join();
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            alreadyRan = false;
+        }
+
+        loader = new GLLoader();
+
         int limit;
         short[] shorts;
         //limit = 8192;
@@ -39,10 +55,18 @@ public class AudioModule implements Runnable {
 
         double[] processedAudio = new double[2 * limit];
         DoubleFFT_1D dfft = new DoubleFFT_1D(limit);
+
+        for(int i = 0; i < 512; i++) {
+            staticData[i] = 0;
+        }
         //getting the audio input in the form of a byte array
         byte[] audioInputBytes = getAudio(duration);
 
+        alreadyRan = (modeOfOp == 1);
+
+
         if (modeOfOp == 1) {
+            ArtGUI.recordState = false;
             //converting the byte array to a short array
             //converting it straight to a double array would not give correct data
             shorts = shortMe(audioInputBytes);
@@ -76,11 +100,6 @@ public class AudioModule implements Runnable {
 
             cntr = 0;
             index = 0;
-
-
-            for(int i = 0; i < 512; i++) {
-                staticData[i] = 0;
-            }
 
             for (double dub : finalAudio) {
                 if (dub < 0) {
@@ -127,20 +146,23 @@ public class AudioModule implements Runnable {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buf = new byte[(int) af.getSampleRate() * af.getFrameSize()];
             byte[] rtBuf = new byte[512];
-            long end, start;
+            long end;
             int len;
             recording = true;
             disableButtons();
             ArtGUI.slider.setEnabled(false);
 
             //starting another thread for the loader...
-            GLLoader loader = new GLLoader();
             loader.width = width;
             loader.height = height;
             loader.fullscreen = fullscreen;
-            //loader.algo = aglo;
-            Thread loaderThread = new Thread(loader);
-            loaderThread.start();
+            loader.mode = modeOfOp;
+            loader.algo = algo;
+
+            if (!alreadyRan) {
+                loaderThread = new Thread(loader);
+                loaderThread.start();
+            }
 
             //for static mode...
             if (modeOfOp == 1) {
@@ -184,15 +206,16 @@ public class AudioModule implements Runnable {
                 }
                 */
 
-                recording = false;
+                loader.destroyWindow();
+                loader.terminate();
+                loaderThread.join();
+
+                ArtGUI.recordState = false;
+                ArtGUI.recordInput.setText("Record Input");
             }
             //no more mode-specific stuff
             enableButtons();
             ArtGUI.slider.setEnabled(true);
-
-            loader.destroyWindow();
-            loader.terminate();
-            loaderThread.join();
 
             line.stop();
             line.close();
