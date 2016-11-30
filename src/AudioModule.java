@@ -18,6 +18,8 @@ public class AudioModule implements Runnable {
     boolean recording = false, fullscreen = false;
     private long window;
     public static double[] rtData = new double[512];
+    public static double[] relData = new double[512];
+    public static double[] oldRtData = new double[512];
     public static double[] staticData = new double[512];
     private GLLoader loader;
     Thread loaderThread;
@@ -179,6 +181,8 @@ public class AudioModule implements Runnable {
 
                 for(int i = 0; i < 512; i++) {
                 	rtData[i] = 0;
+                    relData[i] = 0;
+                    oldRtData[i] = 0;
                 }
 
                 DoubleFFT_1D dfft = new DoubleFFT_1D(512);
@@ -196,8 +200,10 @@ public class AudioModule implements Runnable {
                         if (rtData[index] > 1.0) {
                             rtData[index] = 1.0;
                         }
+                        relData[index] = Math.abs(oldRtData[index] - rtData[index]);
                         //System.out.println(rtData[index]);
                     }
+                    oldRtData = rtData;
                 }
                 /*
                 if (System.currentTimeMillis() >= end) {

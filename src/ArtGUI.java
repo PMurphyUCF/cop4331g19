@@ -234,19 +234,18 @@ public class ArtGUI extends JApplet implements ActionListener {
 
 						switch (getSelectedButtonText(algorithmOption)) {
 							case "Algorithm 1":
-								module.algo = 1;
+								module.algo = 0;
 								break;
 							case "Algorithm 2":
-								module.algo = 2;
+								module.algo = 1;
 								break;
 							case "Algorithm 3":
-								module.algo = 3;
+								module.algo = 2;
 								break;
 							case "Algorithm 4":
-								module.algo = 4;
+								module.algo = 3;
 								break;
 							default:
-								module.algo = 0;
 								return;
 						}
 
