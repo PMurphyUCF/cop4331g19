@@ -18,6 +18,7 @@ public class AudioModule implements Runnable {
     boolean recording = false, fullscreen = false;
     private long window;
     public static double[] rtData = new double[512];
+    public static double[] staticData = new double[512];
     AudioModule(int modeOfOp, int duration) {
         //sets the mode of operation, either static or real time
         //1 for static, 2 for real time
@@ -77,7 +78,9 @@ public class AudioModule implements Runnable {
             index = 0;
 
 
-            double[] staticData = new double[512];
+            for(int i = 0; i < 512; i++) {
+                staticData[i] = 0;
+            }
 
             for (double dub : finalAudio) {
                 if (dub < 0) {
