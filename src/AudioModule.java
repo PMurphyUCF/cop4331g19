@@ -7,8 +7,8 @@ import java.nio.ByteBuffer;
 
 public class AudioModule implements Runnable {
 
-    int modeOfOp, duration;
-    boolean recording = false;
+    int modeOfOp, duration, width, height;
+    boolean recording = false, fullscreen = false;
 
     AudioModule(int modeOfOp, int duration) {
         //sets the mode of operation, either static or real time
@@ -78,6 +78,16 @@ public class AudioModule implements Runnable {
             long end;
             int len;
             recording = true;
+            
+            //starting another thread for the loader...
+            GLLoader loader = new GLLoader();
+            loader.width = width;
+            loader.height = height;
+            loader.fullscreen = fullscreen;
+            Thread loaderThread = new Thread(loader);
+            loaderThread.start();
+
+            //for static mode...
             if (modeOfOp == 1) {
                 end = System.currentTimeMillis() + 1000 * duration;
                 ArtGUI.recordInput.setEnabled(false);
@@ -89,6 +99,7 @@ public class AudioModule implements Runnable {
                 ArtGUI.slider.setEnabled(true);
                 recording = false;
             }
+            //for real time mode...
             else {
                 duration = 10;
                 end = System.currentTimeMillis() + 1000 * duration;
@@ -103,6 +114,8 @@ public class AudioModule implements Runnable {
                 ArtGUI.slider.setEnabled(true);
                 recording = false;
             }
+            //no more mode-specific stuff
+
             line.stop();
             line.close();
 

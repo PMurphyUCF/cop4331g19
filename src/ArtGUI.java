@@ -207,6 +207,32 @@ public class ArtGUI extends JApplet implements ActionListener {
 						int sliderPos = slider.getValue();
 						//start the recording
 						module = new AudioModule(mode, sliderPos);
+
+						switch (getSelectedButtonText(resolutionOption)) {
+							case "640x480":
+								module.width = 640;
+								module.height = 480;
+								module.fullscreen = false;
+								break;
+							case "1280x720":
+								module.width = 1280;
+								module.height = 720;
+								module.fullscreen = false;
+								break;
+							case "1920x1080":
+								module.width = 1920;
+								module.height = 1080;
+								module.fullscreen = false;
+								break;
+							case "Fullscreen":
+								module.width = 0;
+								module.height = 0;
+								module.fullscreen = true;
+								break;
+							default:
+								return;
+						}
+
 						Thread audioThread = new Thread(module);
 						audioThread.start();
 					} catch (Exception e1) {

@@ -8,13 +8,20 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
 import java.util.Random;
 
-public class GLLoader {
+public class GLLoader implements Runnable{
 
 	// The window handle
 	private long window;
 	private int windowW;
 	private int windowH;
-	public void run(int width, int height, boolean fullscreen) {
+
+	public int width = 0, height = 0;
+	public boolean fullscreen = false;
+	public void run() {
+		runLoader(width, height, fullscreen);
+	}
+
+	public void runLoader(int width, int height, boolean fullscreen) {
 		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
 		try {
 			init(width, height, fullscreen);
