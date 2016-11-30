@@ -13,35 +13,32 @@ public class ArtGUI extends JApplet implements ActionListener {
 	boolean recordState = false;
 	public static JButton recordInput, saveImage;
 	public static JSlider slider;
-	private ButtonGroup algorithmOption, modeOption;
-	private JRadioButton staticImage, realImage, algo1, algo2, algo3, algo4;
+	private ButtonGroup algorithmOption, modeOption, resolutionOption;
+	private JRadioButton staticImage, realImage, algo1, algo2, algo3, algo4, reso1, reso2, reso3, reso4;
 	private AudioModule module;
+	private JPanel centerPanel;
 	
 	public void init(){
 		recordState = false;
-	
+
 		//setDefaultCloseOperation(JApplet.EXIT_ON_CLOSE);
 		setSize(770,550);
-		
+		centerPanel = new JPanel(new GridLayout(1, 1));
+		add(centerPanel, BorderLayout.CENTER);
+
 		createMenu();
-		
-		
-		
-		createSouthPanel();
-		
-		
-		createEastPanel();
-		
+
 		createWestPanel();
-		
-	
+		createEastPanel();
+		createSouthPanel();
+
 	}
 	
 	private void createWestPanel(){
 		JPanel westPanel = new JPanel();
 		westPanel.setLayout(new BoxLayout(westPanel,BoxLayout.Y_AXIS));
         westPanel.setBorder(BorderFactory.createTitledBorder("Select Style"));
-        add(westPanel,BorderLayout.WEST);
+        centerPanel.add(westPanel);
         
         algorithmOption = new ButtonGroup();
         algo1 = new JRadioButton("Algorithm 1");
@@ -62,20 +59,35 @@ public class ArtGUI extends JApplet implements ActionListener {
         westPanel.add(algo2);
         westPanel.add(algo3);
         westPanel.add(algo4);
-        
-        
-        
 	}
 	
 	
 	
 	private void createEastPanel(){
 		JPanel eastPanel = new JPanel();
-		//eastPanel.setLayout(new BoxLayout(eastPanel,BoxLayout.Y_AXIS));
-        //add(eastPanel,BorderLayout.EAST);
-        
-        eastPanel.setBorder(BorderFactory.createTitledBorder("Image Output"));
-        add(eastPanel,BorderLayout.CENTER);
+		eastPanel.setLayout(new BoxLayout(eastPanel,BoxLayout.Y_AXIS));
+		eastPanel.setBorder(BorderFactory.createTitledBorder("Resolution"));
+        centerPanel.add(eastPanel);
+
+		resolutionOption = new ButtonGroup();
+		reso1 = new JRadioButton("640x480");
+		reso1.setFont(new Font(Font.DIALOG,Font.PLAIN,24));
+		reso2 = new JRadioButton("1280x720");
+		reso2.setFont(new Font(Font.DIALOG,Font.PLAIN,24));
+		reso3 = new JRadioButton("1920x1080");
+		reso3.setFont(new Font(Font.DIALOG,Font.PLAIN,24));
+		reso4 = new JRadioButton("Fullscreen");
+		reso4.setFont(new Font(Font.DIALOG,Font.PLAIN,24));
+
+		resolutionOption.add(reso1);
+		resolutionOption.add(reso2);
+		resolutionOption.add(reso3);
+		resolutionOption.add(reso4);
+
+		eastPanel.add(reso1);
+		eastPanel.add(reso2);
+		eastPanel.add(reso3);
+		eastPanel.add(reso4);
 	}
 	
 	private void createSouthPanel(){
@@ -164,6 +176,11 @@ public class ArtGUI extends JApplet implements ActionListener {
 
 					if (getSelectedButtonText(algorithmOption).equals("")) {
 						infoBox("Please select an Algorithm", "Unable to Proceed");
+						return;
+					}
+
+					if (getSelectedButtonText(resolutionOption).equals("")) {
+						infoBox("Please select a Resolution", "Unable to Proceed");
 						return;
 					}
 
