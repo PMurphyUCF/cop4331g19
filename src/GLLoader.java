@@ -145,12 +145,15 @@ public class GLLoader implements Runnable{
 		//setColor(material);	
 		glDisable(GL_LIGHTING);
 		glDisable(GL_TEXTURE_2D);
+		
+		double[] tmp = AudioModule.rtData;
 		Random Random = new Random() ; 
 		for(int i=0;i<64;i++){
 			for(int k=0;k<32;k++){
-				float rn = Random.nextFloat();
-				float rn1 = Random.nextFloat();
-				float rn2 = Random.nextFloat();
+				float rn = (float) tmp[(i + k*64) % 512];
+				float rn1 = (float) tmp[(i + k*64) % 512];
+				float rn2 = (float) tmp[(i + k*64) % 512];
+                System.out.printf("vals %d, %f\n", (i + k*64) % 512, tmp[(i + k*64) % 512]);
 				glBegin(GL_QUADS);
 				glColor3f(rn,rn1,rn2);
 		        glVertex2i(storage[i][k].bl.x,storage[i][k].bl.y); //bottom-left vertex
@@ -175,6 +178,7 @@ public class GLLoader implements Runnable{
 		int PADDING_HALF=2;	
 		int x=0;
 		int y=0;
+		
 		for(int i=0;i<64;i++){
 			x++;
 			y=0;
