@@ -6,19 +6,21 @@ import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
-
+import java.util.Random;
 
 public class GLLoader {
 
 	// The window handle
 	private long window;
 
-	public void run() {
+	public void run(int width, int height) {
 		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
-
+		//if (width == 99999 & height ==99999){
+		
+		//}
 		try {
-			init();
-			loop();
+			init(width, height);
+			loop(width, height);
 
 			// Free the window callbacks and destroy the window
 			glfwFreeCallbacks(window);
@@ -30,7 +32,7 @@ public class GLLoader {
 		}
 	}
 
-	private void init() {
+	private void init(int WIDTH, int HEIGHT) {
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.
 		GLFWErrorCallback.createPrint(System.err).set();
@@ -42,13 +44,10 @@ public class GLLoader {
 		// Configure our window
 		glfwDefaultWindowHints(); // optional, the current window hints are already the default
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
-		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
-
-		int WIDTH = 800;
-		int HEIGHT = 600;
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // the window will be resizable
 
 		// Create the window
-		window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, NULL);
+		window = glfwCreateWindow(WIDTH, HEIGHT, "Visualizer Output", NULL, NULL);
 		if ( window == NULL )
 			throw new RuntimeException("Failed to create the GLFW window");
 
@@ -76,7 +75,7 @@ public class GLLoader {
 		glfwShowWindow(window);
 	}
 
-	private void loop() {
+	private void loop(int WIDTH, int HEIGHT) {
 		// This line is critical for LWJGL's interoperation with GLFW's
 		// OpenGL context, or any context that is managed externally.
 		// LWJGL detects the context that is current in the current thread,
@@ -85,36 +84,44 @@ public class GLLoader {
 		GL.createCapabilities();
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(0, 800, 0, 600, 1, -1);
+		glOrtho(0, 640, 0, 640*HEIGHT/WIDTH, 1, -1);
 		glMatrixMode(GL_MODELVIEW);
 		//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );   wireframemode
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		// the window or has pressed the ESCAPE key.
 		while ( !glfwWindowShouldClose(window) ) {
 			draw();	
+			sync(5);
 		}
 	}
 	
 	private void draw() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		int SIZE=32; 
-		int PADDING_HALF=1;	
+		int SIZE=16; 
+		int PADDING_HALF=2;	
 		//setColor(material);	
 		int x=0;
 		int y=0;	
 		glDisable(GL_LIGHTING);
 		glDisable(GL_TEXTURE_2D);
-		for(int i=0;i<32;i++){
+		Random Random = new Random() ; 
+		for(int i=0;i<64;i++){
 			x++;
 			y=0;
 			for(int k=0;k<32;k++){
 				y++;
-				glColor3f(1.0f,1.0f, 1.0f);
+				float rn = Random.nextFloat();
+				float rn1 = Random.nextFloat();
+				float rn2 = Random.nextFloat();
 				glBegin(GL_QUADS);
+				glColor3f(rn,rn1,rn2);
 		        glVertex2i(SIZE*(x-1) + PADDING_HALF, SIZE*(y-1) + PADDING_HALF); //bottom-left vertex
+		      //  glColor3f(rn,rn1,rn2);
 		        glVertex2i(SIZE*x     - PADDING_HALF, SIZE*(y-1) + PADDING_HALF); //bottom-right vertex
+		      //  glColor3f(rn,rn1,rn2);
 		        glVertex2i(SIZE*x     - PADDING_HALF, SIZE*y     - PADDING_HALF); //top-right vertex
+		        //glColor3f(rn,rn1,rn2);
 		        glVertex2i(SIZE*(x-1) + PADDING_HALF, SIZE*y     - PADDING_HALF); //top-left vertex
 		        glEnd();
 			}
@@ -125,10 +132,58 @@ public class GLLoader {
 		glfwPollEvents();
 			
 	}
-		
+    private long variableYieldTime, lastTime;
+    
+    /**
+     * An accurate sync method that adapts automatically
+     * to the system it runs on to provide reliable results.
+     * 
+     * @param fps The desired frame rate, in frames per second
+     * @author kappa (On the LWJGL Forums)
+     */
+    
+    private void sync(int fps) {
+        if (fps <= 0) return;
+          
+        long sleepTime = 1000000000 / fps; // nanoseconds to sleep this frame
+        // yieldTime + remainder micro & nano seconds if smaller than sleepTime
+        long yieldTime = Math.min(sleepTime, variableYieldTime + sleepTime % (1000*1000));
+        long overSleep = 0; // time the sync goes over by
+          
+        try {
+            while (true) {
+                long t = System.nanoTime() - lastTime;
+                  
+                if (t < sleepTime - yieldTime) {
+                    Thread.sleep(1);
+                }else if (t < sleepTime) {
+                    // burn the last few CPU cycles to ensure accuracy
+                    Thread.yield();
+                }else {
+                    overSleep = t - sleepTime;
+                    break; // exit while loop
+                }
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }finally{
+            lastTime = System.nanoTime() - Math.min(overSleep, sleepTime);
+             
+            // auto tune the time sync should yield
+            if (overSleep > variableYieldTime) {
+                // increase by 200 microseconds (1/5 a ms)
+                variableYieldTime = Math.min(variableYieldTime + 200*1000, sleepTime);
+            }
+            else if (overSleep < variableYieldTime - 200*1000) {
+                // decrease by 2 microseconds
+                variableYieldTime = Math.max(variableYieldTime - 2*1000, 0);
+            }
+        }
+    }
+    
 	
-	public static void main(String[] args) {
-		new GLLoader().run();
+	/*public static void main(String[] args) {
+		new GLLoader().run(1280,720);
 	}
-	
+	*/
 }
