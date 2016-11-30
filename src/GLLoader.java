@@ -22,22 +22,41 @@ public class GLLoader implements Runnable{
 	public int width = 0, height = 0;
 	public boolean fullscreen = false;
 	private volatile boolean running = true;
-
+	private quaddata storage[][];
+	
 	public void run() {
 		running = true;
 		runLoader(width, height, fullscreen);
 	}
 
+	private class point{
+		int x;
+		int y;
+	}
+	
+	private class quaddata{
+        point bl; //bottom-left vertex
+        point br; //bottom-right vertex
+        point tr; //top-right vertex
+        point tl; //top-left vertex
+        quaddata(){
+        	bl = new point();
+        	br = new point();
+        	tr = new point();
+        	tl = new point();
+        }
+	}
+	
 	public void terminate() {
 		running = false;
 	}
 
 	public void runLoader(int width, int height, boolean fullscreen) {
 		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
+		arrayFiller();
 		try {
 			init(width, height, fullscreen);
 			loop();
-
 			// Free the window callbacks and destroy the window
 			glfwFreeCallbacks(window);
 			glfwDestroyWindow(window);
@@ -123,40 +142,61 @@ public class GLLoader implements Runnable{
 	private void draw() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		int SIZE=16; 
-		int PADDING_HALF=2;	
 		//setColor(material);	
-		int x=0;
-		int y=0;	
 		glDisable(GL_LIGHTING);
 		glDisable(GL_TEXTURE_2D);
 		Random Random = new Random() ; 
 		for(int i=0;i<64;i++){
-			x++;
-			y=0;
 			for(int k=0;k<32;k++){
-				y++;
 				float rn = Random.nextFloat();
 				float rn1 = Random.nextFloat();
 				float rn2 = Random.nextFloat();
 				glBegin(GL_QUADS);
 				glColor3f(rn,rn1,rn2);
-		        glVertex2i(SIZE*(x-1) + PADDING_HALF, SIZE*(y-1) + PADDING_HALF); //bottom-left vertex
+		        glVertex2i(storage[i][k].bl.x,storage[i][k].bl.y); //bottom-left vertex
 		      //  glColor3f(rn,rn1,rn2);
-		        glVertex2i(SIZE*x     - PADDING_HALF, SIZE*(y-1) + PADDING_HALF); //bottom-right vertex
+		        glVertex2i(storage[i][k].br.x, storage[i][k].br.y); //bottom-right vertex
 		      //  glColor3f(rn,rn1,rn2);
-		        glVertex2i(SIZE*x     - PADDING_HALF, SIZE*y     - PADDING_HALF); //top-right vertex
+		        glVertex2i(storage[i][k].tr.x, storage[i][k].tr.y); //top-right vertex
 		        //glColor3f(rn,rn1,rn2);
-		        glVertex2i(SIZE*(x-1) + PADDING_HALF, SIZE*y     - PADDING_HALF); //top-left vertex
+		        glVertex2i(storage[i][k].tl.x, storage[i][k].tl.y); //top-left vertex
 		        glEnd();
 			}
 		}
 		glEnable(GL_LIGHTING);
 		glEnable(GL_TEXTURE_2D);
 		glfwSwapBuffers(window);
-		glfwPollEvents();
-			
+		glfwPollEvents();	
 	}
+	
+	private void arrayFiller(){
+		storage = new quaddata[64][32];
+		int SIZE=16; 
+		int PADDING_HALF=2;	
+		int x=0;
+		int y=0;
+		for(int i=0;i<64;i++){
+			x++;
+			y=0;
+			for(int k=0;k<32;k++){
+				y++;
+				storage[i][k] = new quaddata();
+		        storage[i][k].bl.x = SIZE*(x-1) + PADDING_HALF;
+		        storage[i][k].bl.y = SIZE*(y-1) + PADDING_HALF;
+		       
+		        storage[i][k].br.x = SIZE*x - PADDING_HALF;
+		        storage[i][k].br.y = SIZE*(y-1) + PADDING_HALF;
+		        
+		        storage[i][k].tr.x = SIZE*x - PADDING_HALF;
+		        storage[i][k].tr.y = SIZE*y - PADDING_HALF;
+		        
+		        storage[i][k].tl.x = SIZE*(x-1) + PADDING_HALF;
+		        storage[i][k].tl.y = SIZE*y - PADDING_HALF;
+		      
+			}
+		}
+	}
+
     private long variableYieldTime, lastTime;
     
     /**

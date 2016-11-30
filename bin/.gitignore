@@ -3,3 +3,8 @@
 /AudioModule.class
 /GLLoader.class
 /Shaders/
+/GLLoader$quaddata.class
+/GLLoader$point.class
+/GLLoader$noise.class
+/GLLoader$simplexnoise.class
+/simplexnoise.class
