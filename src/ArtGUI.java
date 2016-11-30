@@ -14,7 +14,7 @@ public class ArtGUI extends JApplet implements ActionListener {
 	public static JButton recordInput, saveImage;
 	public static JSlider slider;
 	private ButtonGroup algorithmOption, modeOption, resolutionOption;
-	private JRadioButton staticImage, realImage, algo1, algo2, algo3, algo4, reso1, reso2, reso3, reso4;
+	static JRadioButton staticImage, realImage, algo1, algo2, algo3, algo4, reso1, reso2, reso3, reso4;
 	private AudioModule module;
 	private JPanel centerPanel;
 	

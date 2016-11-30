@@ -81,7 +81,8 @@ public class AudioModule implements Runnable {
             long end;
             int len;
             recording = true;
-            
+            disableButtons();
+
             //starting another thread for the loader...
             GLLoader loader = new GLLoader();
             loader.width = width;
@@ -89,7 +90,7 @@ public class AudioModule implements Runnable {
             loader.fullscreen = fullscreen;
             Thread loaderThread = new Thread(loader);
             loaderThread.start();
-            window=loader.windowReturn();
+
             //for static mode...
             if (modeOfOp == 1) {
                 end = System.currentTimeMillis() + 1000 * duration;
@@ -118,6 +119,7 @@ public class AudioModule implements Runnable {
                 recording = false;
             }
             //no more mode-specific stuff
+            enableButtons();
 
             line.stop();
             line.close();
@@ -131,6 +133,30 @@ public class AudioModule implements Runnable {
         }
 
         return output;
+    }
+
+    private void disableButtons() {
+        ArtGUI.algo1.setEnabled(false);
+        ArtGUI.algo2.setEnabled(false);
+        ArtGUI.algo3.setEnabled(false);
+        ArtGUI.algo4.setEnabled(false);
+
+        ArtGUI.reso1.setEnabled(false);
+        ArtGUI.reso2.setEnabled(false);
+        ArtGUI.reso3.setEnabled(false);
+        ArtGUI.reso4.setEnabled(false);
+    }
+
+    private void enableButtons() {
+        ArtGUI.algo1.setEnabled(true);
+        ArtGUI.algo2.setEnabled(true);
+        ArtGUI.algo3.setEnabled(true);
+        ArtGUI.algo4.setEnabled(true);
+
+        ArtGUI.reso1.setEnabled(true);
+        ArtGUI.reso2.setEnabled(true);
+        ArtGUI.reso3.setEnabled(true);
+        ArtGUI.reso4.setEnabled(true);
     }
 
     public double[] toDoubleArray(byte[] byteArray){
