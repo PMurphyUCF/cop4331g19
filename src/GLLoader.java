@@ -2,6 +2,7 @@ import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
+
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -18,15 +19,23 @@ public class GLLoader implements Runnable{
 	private long window;
 	private int windowW;
 	private int windowH;
-
+	private int xArrayVal =64;
+	private int yArrayVal =32;
+	
 	public int width = 0, height = 0, algo = 0, mode = 0;
 	public boolean fullscreen = false;
 	private volatile boolean running = true;
 	private quaddata storage[][];
+	private float alphaChannels[][] = new float[xArrayVal][yArrayVal];
+	private colorquad colorChannels[][] = new colorquad[xArrayVal][yArrayVal];
+	private colorquad colorChannelsActive[][] = new colorquad[xArrayVal][yArrayVal];
+	private static final int[] xmove = {0,1,0,-1};
+	private static final int[] ymove = {-1,0,1,0};
+	
 	
 	public void run() {
 		running = true;
-		runLoader(width, height, fullscreen);
+		runLoader(width, height, fullscreen, algo);
 	}
 
 	private class point{
@@ -47,13 +56,22 @@ public class GLLoader implements Runnable{
         }
 	}
 	
+	private class colorquad{
+        float r;
+        float g;
+        float b;
+	}
+	
 	public void terminate() {
 		running = false;
 	}
 
-	public void runLoader(int width, int height, boolean fullscreen) {
+	public void runLoader(int width, int height, boolean fullscreen, int algoC) {
 		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
 		arrayFiller();
+		algo = algoC;
+		arrayFiller();
+		vertexArrayFillerInit();
 		try {
 			init(width, height, fullscreen);
 			loop();
@@ -133,19 +151,33 @@ public class GLLoader implements Runnable{
 		//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );   wireframemode
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		// the window or has pressed the ESCAPE key.
+		int frame =0;
 		while ( !glfwWindowShouldClose(window) ) {
 			draw();	
+			frame++;
+			if(frame%2==0){
+				alphaFiller();
+			}
+			if(frame%3==0){
+				fadeout();
+			}
+			if(frame==30){
+				frame=0;
+			}
 			sync(5);
 		}
 	}
 	
 	private void draw() {
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		//setColor(material);	
 		glDisable(GL_LIGHTING);
 		glDisable(GL_TEXTURE_2D);
-
+		glDisable(GL_LIGHTING);
+		glDisable(GL_TEXTURE_2D);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		double[] tmp;
 		if (mode == 1) {
 			tmp = AudioModule.staticData;
@@ -155,41 +187,59 @@ public class GLLoader implements Runnable{
 		}
 
 		Random Random = new Random() ; 
-		for(int i=0;i<64;i++){
-			for(int k=0;k<32;k++){
-				float rn = (float) tmp[(i + k*64) % 512];
-				float rn1 = (float) tmp[(i + k*64) % 512];
-				float rn2 = (float) tmp[(i + k*64) % 512];
-                System.out.printf("vals %d, %f\n", (i + k*64) % 512, tmp[(i + k*64) % 512]);
-				glBegin(GL_QUADS);
-				glColor3f(rn,rn1,rn2);
-		        glVertex2i(storage[i][k].bl.x,storage[i][k].bl.y); //bottom-left vertex
-		      //  glColor3f(rn,rn1,rn2);
-		        glVertex2i(storage[i][k].br.x, storage[i][k].br.y); //bottom-right vertex
-		      //  glColor3f(rn,rn1,rn2);
-		        glVertex2i(storage[i][k].tr.x, storage[i][k].tr.y); //top-right vertex
-		        //glColor3f(rn,rn1,rn2);
-		        glVertex2i(storage[i][k].tl.x, storage[i][k].tl.y); //top-left vertex
-		        glEnd();
+		switch (algo){
+			case 0:
+			for(int i=0;i<64;i++){
+				for(int k=0;k<32;k++){
+					float rn = (float) tmp[(i + k*64) % 512];
+					float rn1 = (float) tmp[(i + k*64) % 512];
+					float rn2 = (float) tmp[(i + k*64) % 512];
+	                System.out.printf("vals %d, %f\n", (i + k*64) % 512, tmp[(i + k*64) % 512]);
+					glBegin(GL_QUADS);
+					glColor3f(rn,rn1,rn2);
+			        glVertex2i(storage[i][k].bl.x,storage[i][k].bl.y); //bottom-left vertex
+			      //  glColor3f(rn,rn1,rn2);
+			        glVertex2i(storage[i][k].br.x, storage[i][k].br.y); //bottom-right vertex
+			      //  glColor3f(rn,rn1,rn2);
+			        glVertex2i(storage[i][k].tr.x, storage[i][k].tr.y); //top-right vertex
+			        //glColor3f(rn,rn1,rn2);
+			        glVertex2i(storage[i][k].tl.x, storage[i][k].tl.y); //top-left vertex
+			        glEnd();
+				}
 			}
+			case 1:
+			for(int i=0;i<xArrayVal;i++){
+				for(int k=0;k<yArrayVal;k++){
+					glBegin(GL_QUADS);
+					glColor4f(colorChannelsActive[i][k].r,colorChannelsActive[i][k].g,colorChannelsActive[i][k].b,alphaChannels[i][k]);
+			        glVertex2i(storage[i][k].bl.x,storage[i][k].bl.y); //bottom-left vertex
+			        glVertex2i(storage[i][k].br.x, storage[i][k].br.y); //bottom-right vertex
+			        glVertex2i(storage[i][k].tr.x, storage[i][k].tr.y); //top-right vertex
+			        glVertex2i(storage[i][k].tl.x, storage[i][k].tl.y); //top-left vertex
+			        glEnd();
+				}
+			}
+	
+			
 		}
+
 		glEnable(GL_LIGHTING);
 		glEnable(GL_TEXTURE_2D);
+		glDisable(GL_BLEND);
 		glfwSwapBuffers(window);
 		glfwPollEvents();	
 	}
 	
 	private void arrayFiller(){
-		storage = new quaddata[64][32];
+		storage = new quaddata[xArrayVal][yArrayVal];
 		int SIZE=16; 
 		int PADDING_HALF=2;	
 		int x=0;
 		int y=0;
-		
-		for(int i=0;i<64;i++){
+		for(int i=0;i<xArrayVal;i++){
 			x++;
 			y=0;
-			for(int k=0;k<32;k++){
+			for(int k=0;k<yArrayVal;k++){
 				y++;
 				storage[i][k] = new quaddata();
 		        storage[i][k].bl.x = SIZE*(x-1) + PADDING_HALF;
@@ -207,7 +257,98 @@ public class GLLoader implements Runnable{
 			}
 		}
 	}
-
+	
+	private void colorCrawler (int x, int y, int Magnitude, colorquad Color){
+		if(Magnitude <=0){
+			return;
+		}
+		int ytemp;
+		int xtemp;
+		for(int i=0; i<4; i++)
+		{	
+			xtemp = x+xmove[i];
+			ytemp = y+ymove[i];
+			if (!((xtemp <0) || (xtemp>(xArrayVal-1)) || (ytemp <0) || (ytemp>(yArrayVal-1))))
+			{
+				colorChannelsActive[x][y].r = (colorChannelsActive[x][y].r + Color.r)/2;
+				colorCrawler(xtemp, ytemp, Magnitude--, Color);
+			}
+		}
+	}
+	
+	private void fadeout(){
+		for(int i=0;i<xArrayVal;i++){
+			for(int k=0;k<yArrayVal;k++){
+				colorChannelsActive[i][k].r = colorChannelsActive[i][k].r - 0.05f;
+				if(colorChannelsActive[i][k].r<0.0f){
+					colorChannelsActive[i][k].r=0.0f;
+				}
+				colorChannelsActive[i][k].g = colorChannelsActive[i][k].g - 0.05f;
+				if(colorChannelsActive[i][k].g<0.0f){
+					colorChannelsActive[i][k].g=0.0f;
+				}
+				colorChannelsActive[i][k].b = colorChannelsActive[i][k].b - 0.05f;
+				if(colorChannelsActive[i][k].b<0.0f){
+					colorChannelsActive[i][k].b=0.0f;
+				}
+			}
+		}
+	}
+	
+	private void vertexArrayFillerInit(){
+		float theta;
+		for(int i =0; i<xArrayVal; i++){
+			for(int k=0; k<yArrayVal;k++){
+				alphaChannels[i][k]=1.0f;
+				colorquad colors = new colorquad();
+				colorquad colorsActive = new colorquad();
+				theta = (float) i * k;
+			    while (theta < 0){
+			    	theta += 360;
+			    }	        			 
+			    while (theta >= 360){
+			    	theta -= 360;
+			    }			   	 
+			    if (theta < 120) {
+			    	colors.g = theta / 120;
+			        colors.r = 1 - colors.g;
+			        colors.b = 0;
+			    } else if (theta < 240) {    
+			    	colors.b = (theta - 120) / 120;
+			        colors.g = 1 - colors.b;
+			        colors.r = 0;
+			    } else {
+			    	colors.r = (theta - 240) / 120;
+			    	colors.b = 1 - colors.r;
+			        colors.g = 0;
+			    }
+			    colorsActive.r = 0.0f;
+		    	colorsActive.b = 0.0f;
+		        colorsActive.g = 0.0f;
+				colorChannels[i][k]=colors;
+				colorChannelsActive[i][k]=colorsActive;
+			}
+		}
+	}
+	
+	private void alphaFiller(){
+		float alpha;
+		Random Random = new Random() ;
+		for(int i =0; i<xArrayVal; i++){
+			for(int k=0; k<yArrayVal;k++){
+				int seed = Random.nextInt(1000);
+				alpha = alphaChannels[i][k]  + noise.noise(i+seed,k+seed)/8;
+				if(alpha >= 1.0f || alpha <= 0.0f ){
+					alphaChannels[i][k] = 1.0f;
+				}
+				else{
+					alphaChannels[i][k]=alpha;
+				}		
+			}
+		}
+	}
+	
+	
     private long variableYieldTime, lastTime;
     
     /**
