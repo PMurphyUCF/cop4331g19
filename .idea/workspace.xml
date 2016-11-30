@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9e5f608e-1043-44df-899e-0d4b5425a463" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/AudioModule.java" afterPath="$PROJECT_DIR$/src/AudioModule.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/GLLoader.java" afterPath="$PROJECT_DIR$/src/GLLoader.java" />
     </list>
     <ignored path="cop4331g19.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -34,21 +34,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="AudioModule.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="AudioModule.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/AudioModule.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="97">
-              <caret line="79" column="13" selection-start-line="79" selection-start-column="13" selection-end-line="79" selection-end-column="13" />
+            <state relative-caret-position="505">
+              <caret line="149" column="89" selection-start-line="149" selection-start-column="89" selection-end-line="149" selection-end-column="89" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GLLoader.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="GLLoader.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/GLLoader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="199">
-              <caret line="204" column="13" selection-start-line="204" selection-start-column="13" selection-end-line="204" selection-end-column="13" />
+            <state relative-caret-position="187">
+              <caret line="23" column="44" selection-start-line="23" selection-start-column="44" selection-end-line="23" selection-end-column="44" />
               <folding>
                 <element signature="e#703#704#0" expanded="true" />
                 <element signature="e#725#726#0" expanded="true" />
@@ -71,8 +71,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/ArtGUI.java" />
-        <option value="$PROJECT_DIR$/src/AudioModule.java" />
         <option value="$PROJECT_DIR$/src/GLLoader.java" />
+        <option value="$PROJECT_DIR$/src/AudioModule.java" />
       </list>
     </option>
   </component>
@@ -137,6 +137,20 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cop4331g19" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cop4331g19" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="lib" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -511,14 +525,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/AudioModule.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="97">
-          <caret line="79" column="13" selection-start-line="79" selection-start-column="13" selection-end-line="79" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$PROJECT_DIR$/include/lwjgl-glfw.jar!/org/lwjgl/glfw/GLFWKeyCallbackI.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="272">
@@ -529,12 +535,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/GLLoader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="199">
-          <caret line="204" column="13" selection-start-line="204" selection-start-column="13" selection-end-line="204" selection-end-column="13" />
+        <state relative-caret-position="187">
+          <caret line="23" column="44" selection-start-line="23" selection-start-column="44" selection-end-line="23" selection-end-column="44" />
           <folding>
             <element signature="e#703#704#0" expanded="true" />
             <element signature="e#725#726#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/AudioModule.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="505">
+          <caret line="149" column="89" selection-start-line="149" selection-start-column="89" selection-end-line="149" selection-end-column="89" />
+          <folding />
         </state>
       </provider>
     </entry>

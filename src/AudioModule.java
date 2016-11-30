@@ -29,6 +29,7 @@ public class AudioModule implements Runnable {
         //run it based on the algorithm number (algoNum)
 
         int limit;
+        int max = 1000000;
         short[] shorts;
         //limit = 8192;
         limit = 32768;
@@ -48,13 +49,48 @@ public class AudioModule implements Runnable {
         }
         //getting the fft data from the imported JTransforms library
         dfft.realForward(processedAudio);
-        int cntr = 0;
-        //printing fft data to transform
+        long cntr = 0;
+        int index = 0;
+
         for (double dub : processedAudio) {
-            System.out.println(dub);
-            cntr++;
+            if (dub < max && dub > -max && dub != 0.0) {
+                cntr++;
+            }
         }
-        System.out.println(cntr + " total data points");
+
+        double[] finalAudio = new double[(int) cntr];
+
+        for (double dub : processedAudio) {
+            if (dub < max && dub > -max && dub != 0.0) {
+                finalAudio[index] = dub;
+                index++;
+            }
+        }
+
+        int div = finalAudio.length/512;
+        //printing fft data to transform
+
+        cntr = 0;
+        index = 0;
+
+        if (modeOfOp == 1) {
+
+            double[] staticData = new double[512];
+
+            for (double dub : finalAudio) {
+                if (dub < 0) {
+                    dub *= -1;
+                }
+                cntr++;
+                if (cntr % div == 0 && index < 512) {
+                    staticData[index++] = dub/max;
+                    System.out.println(dub/max);
+                }
+            }
+            System.out.println(index + " static data points");
+
+            //send on over the staticData array to be used to make purrty visual stuff
+        }
     }
 
     public byte[] getAudio(int duration) {
@@ -81,10 +117,11 @@ public class AudioModule implements Runnable {
             line.start();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buf = new byte[(int) af.getSampleRate() * af.getFrameSize()];
-            long end;
+            long end, start;
             int len;
             recording = true;
             disableButtons();
+            ArtGUI.slider.setEnabled(false);
 
             //starting another thread for the loader...
             GLLoader loader = new GLLoader();
@@ -98,31 +135,35 @@ public class AudioModule implements Runnable {
             if (modeOfOp == 1) {
                 end = System.currentTimeMillis() + 1000 * duration;
                 ArtGUI.recordInput.setEnabled(false);
-                ArtGUI.slider.setEnabled(false);
                 while (System.currentTimeMillis() < end && ((len = line.read(buf, 0, buf.length)) != -1)) {
                     baos.write(buf, 0, len);
                 }
                 ArtGUI.recordInput.setEnabled(true);
-                ArtGUI.slider.setEnabled(true);
                 recording = false;
             }
             //for real time mode...
             else {
                 duration = 10;
-                end = System.currentTimeMillis() + 1000 * duration;
-                ArtGUI.slider.setEnabled(false);
+                double[] rtData = new double[512];
+                start = System.currentTimeMillis();
+                end = start + 1000 * duration;
                 while (recording && System.currentTimeMillis() < end && ((len = line.read(buf, 0, buf.length)) != -1)) {
                     baos.write(buf, 0, len);
+                    //this while loop creates a buf array of 5500 elements every second.
+                    //need to send 512 data points 30 times a second somehow...
+                    short[] s = shortMe(buf);
+                    System.out.println(s[2750]);
                 }
                 if (System.currentTimeMillis() >= end) {
                     ArtGUI.recordInput.doClick();
                     ArtGUI.infoBox("The max duration has been reached", "Recording Stopped");
                 }
-                ArtGUI.slider.setEnabled(true);
+
                 recording = false;
             }
             //no more mode-specific stuff
             enableButtons();
+            ArtGUI.slider.setEnabled(true);
 
             loader.destroyWindow();
             loader.terminate();
