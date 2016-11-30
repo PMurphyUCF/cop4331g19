@@ -12,15 +12,13 @@ public class GLLoader {
 
 	// The window handle
 	private long window;
-
-	public void run(int width, int height) {
+	private int windowW;
+	private int windowH;
+	public void run(int width, int height, boolean fullscreen) {
 		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
-		//if (width == 99999 & height ==99999){
-		
-		//}
 		try {
-			init(width, height);
-			loop(width, height);
+			init(width, height, fullscreen);
+			loop();
 
 			// Free the window callbacks and destroy the window
 			glfwFreeCallbacks(window);
@@ -32,7 +30,7 @@ public class GLLoader {
 		}
 	}
 
-	private void init(int WIDTH, int HEIGHT) {
+	private void init(int WIDTH, int HEIGHT, boolean FULLSCREEN) {
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.
 		GLFWErrorCallback.createPrint(System.err).set();
@@ -47,7 +45,12 @@ public class GLLoader {
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // the window will be resizable
 
 		// Create the window
+		if(FULLSCREEN==false){
 		window = glfwCreateWindow(WIDTH, HEIGHT, "Visualizer Output", NULL, NULL);
+		}
+		else{
+		window = glfwCreateWindow(WIDTH, HEIGHT, "Visualizer Output", glfwGetPrimaryMonitor(), NULL);
+		}
 		if ( window == NULL )
 			throw new RuntimeException("Failed to create the GLFW window");
 
@@ -65,17 +68,18 @@ public class GLLoader {
 			(vidmode.width() - WIDTH) / 2,
 			(vidmode.height() - HEIGHT) / 2
 		);
-
+		windowW=vidmode.width();
+		windowH=vidmode.height();
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(window);
 		// Enable v-sync
 		glfwSwapInterval(1);
-	
+
 		// Make the window visible
 		glfwShowWindow(window);
 	}
 
-	private void loop(int WIDTH, int HEIGHT) {
+	private void loop() {
 		// This line is critical for LWJGL's interoperation with GLFW's
 		// OpenGL context, or any context that is managed externally.
 		// LWJGL detects the context that is current in the current thread,
@@ -84,7 +88,7 @@ public class GLLoader {
 		GL.createCapabilities();
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(0, 640, 0, 640*HEIGHT/WIDTH, 1, -1);
+		glOrtho(0, 640, 0, 640*windowH/windowW, 1, -1);
 		glMatrixMode(GL_MODELVIEW);
 		//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );   wireframemode
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
@@ -183,7 +187,7 @@ public class GLLoader {
     
 	
 	/*public static void main(String[] args) {
-		new GLLoader().run(1280,720);
-	}
-	*/
+		new GLLoader().run(1280,720,true);
+	}*/
+	
 }
