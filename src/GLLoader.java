@@ -36,7 +36,10 @@ public class GLLoader implements Runnable{
 			glfwSetErrorCallback(null).free();
 		}
 	}
-
+	
+	public long windowReturn(){
+		return window;
+	}
 	private void init(int WIDTH, int HEIGHT, boolean FULLSCREEN) {
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.

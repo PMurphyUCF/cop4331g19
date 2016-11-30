@@ -1,6 +1,9 @@
 import org.jtransforms.fft.DoubleFFT_1D;
 
 import javax.sound.sampled.*;
+
+import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
+
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 
@@ -9,7 +12,7 @@ public class AudioModule implements Runnable {
 
     int modeOfOp, duration, width, height;
     boolean recording = false, fullscreen = false;
-
+    private long window;
     AudioModule(int modeOfOp, int duration) {
         //sets the mode of operation, either static or real time
         //1 for static, 2 for real time
@@ -86,7 +89,7 @@ public class AudioModule implements Runnable {
             loader.fullscreen = fullscreen;
             Thread loaderThread = new Thread(loader);
             loaderThread.start();
-
+            window=loader.windowReturn();
             //for static mode...
             if (modeOfOp == 1) {
                 end = System.currentTimeMillis() + 1000 * duration;
@@ -148,4 +151,8 @@ public class AudioModule implements Runnable {
         return out;
     }
 
+    private void destroyWindow(){
+    	glfwDestroyWindow(window);
+    }
+    
 }
