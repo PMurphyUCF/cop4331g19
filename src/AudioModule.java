@@ -14,8 +14,10 @@ import java.nio.ByteBuffer;
 public class AudioModule implements Runnable {
 
     int modeOfOp, duration, width, height;
+    int max = 1000000;
     boolean recording = false, fullscreen = false;
     private long window;
+
     AudioModule(int modeOfOp, int duration) {
         //sets the mode of operation, either static or real time
         //1 for static, 2 for real time
@@ -29,7 +31,6 @@ public class AudioModule implements Runnable {
         //run it based on the algorithm number (algoNum)
 
         int limit;
-        int max = 1000000;
         short[] shorts;
         //limit = 8192;
         limit = 32768;
@@ -39,41 +40,41 @@ public class AudioModule implements Runnable {
         //getting the audio input in the form of a byte array
         byte[] audioInputBytes = getAudio(duration);
 
-        //converting the byte array to a short array
-        //converting it straight to a double array would not give correct data
-        shorts = shortMe(audioInputBytes);
-
-        //converting the short array to a double array
-        for (int i = 0; i<shorts.length; i++) {
-            processedAudio[i] = shorts[i];
-        }
-        //getting the fft data from the imported JTransforms library
-        dfft.realForward(processedAudio);
-        long cntr = 0;
-        int index = 0;
-
-        for (double dub : processedAudio) {
-            if (dub < max && dub > -max && dub != 0.0) {
-                cntr++;
-            }
-        }
-
-        double[] finalAudio = new double[(int) cntr];
-
-        for (double dub : processedAudio) {
-            if (dub < max && dub > -max && dub != 0.0) {
-                finalAudio[index] = dub;
-                index++;
-            }
-        }
-
-        int div = finalAudio.length/512;
-        //printing fft data to transform
-
-        cntr = 0;
-        index = 0;
-
         if (modeOfOp == 1) {
+            //converting the byte array to a short array
+            //converting it straight to a double array would not give correct data
+            shorts = shortMe(audioInputBytes);
+
+            //converting the short array to a double array
+            for (int i = 0; i<shorts.length; i++) {
+                processedAudio[i] = shorts[i];
+            }
+            //getting the fft data from the imported JTransforms library
+            dfft.realForward(processedAudio);
+            long cntr = 0;
+            int index = 0;
+
+            for (double dub : processedAudio) {
+                if (dub < max && dub > -max && dub != 0.0) {
+                    cntr++;
+                }
+            }
+
+            double[] finalAudio = new double[(int) cntr];
+
+            for (double dub : processedAudio) {
+                if (dub < max && dub > -max && dub != 0.0) {
+                    finalAudio[index] = dub;
+                    index++;
+                }
+            }
+
+            int div = finalAudio.length/512;
+            //printing fft data to transform
+
+            cntr = 0;
+            index = 0;
+
 
             double[] staticData = new double[512];
 
@@ -117,6 +118,7 @@ public class AudioModule implements Runnable {
             line.start();
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             byte[] buf = new byte[(int) af.getSampleRate() * af.getFrameSize()];
+            byte[] rtBuf = new byte[512];
             long end, start;
             int len;
             recording = true;
@@ -147,12 +149,26 @@ public class AudioModule implements Runnable {
                 double[] rtData = new double[512];
                 start = System.currentTimeMillis();
                 end = start + 1000 * duration;
-                while (recording && System.currentTimeMillis() < end && ((len = line.read(buf, 0, buf.length)) != -1)) {
-                    baos.write(buf, 0, len);
+                DoubleFFT_1D dfft = new DoubleFFT_1D(512);
+                while (recording && System.currentTimeMillis() < end && ((len = line.read(rtBuf, 0, rtBuf.length)) != -1)) {
+                    baos.write(rtBuf, 0, len);
                     //this while loop creates a buf array of 5500 elements every second.
                     //need to send 512 data points 30 times a second somehow...
-                    short[] s = shortMe(buf);
-                    System.out.println(s[2750]);
+                    short[] s = shortMe(rtBuf);
+                    for (int i = 0; i<s.length; i++) {
+                        rtData[i] = s[i];
+                    }
+                    dfft.realForward(rtData);
+
+                    for (int index=0; index<rtData.length; index++) {
+                        rtData[index] = Math.abs(rtData[index]/20000);
+                        if (rtData[index] > 1.0) {
+                            rtData[index] = 1.0;
+                        }
+                        System.out.println(rtData[index]);
+                    }
+                    //and here rtData needs to be sent
+
                 }
                 if (System.currentTimeMillis() >= end) {
                     ArtGUI.recordInput.doClick();
