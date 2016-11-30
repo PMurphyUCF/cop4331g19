@@ -12,18 +12,19 @@ import java.nio.ByteBuffer;
 
 
 public class AudioModule implements Runnable {
-
+	private static AudioModule LastDec; 
     int modeOfOp, duration, width, height;
     int max = 1000000;
     boolean recording = false, fullscreen = false;
     private long window;
-
+    public static double[] rtData = new double[512];
     AudioModule(int modeOfOp, int duration) {
         //sets the mode of operation, either static or real time
         //1 for static, 2 for real time
         this.modeOfOp = modeOfOp;
         this.duration = duration;
         this.recording = false;
+        AudioModule.LastDec = this;
     }
 
     @Override
@@ -85,13 +86,17 @@ public class AudioModule implements Runnable {
                 cntr++;
                 if (cntr % div == 0 && index < 512) {
                     staticData[index++] = dub/max;
-                    System.out.println(dub/max);
+                    //System.out.println(dub/max);
                 }
             }
             System.out.println(index + " static data points");
 
             //send on over the staticData array to be used to make purrty visual stuff
         }
+    }
+    
+    public static double[] getAudioS(int duration) {
+    	return toDoubleArray(AudioModule.LastDec.getAudio(duration));
     }
 
     public byte[] getAudio(int duration) {
@@ -146,7 +151,10 @@ public class AudioModule implements Runnable {
             //for real time mode...
             else {
                 duration = 10;
-                double[] rtData = new double[512];
+                //double[] rtData = new double[512];
+                for(int i = 0; i < 512; i++) {
+                	rtData[i] = 0;
+                }
                 start = System.currentTimeMillis();
                 end = start + 1000 * duration;
                 DoubleFFT_1D dfft = new DoubleFFT_1D(512);
@@ -165,7 +173,7 @@ public class AudioModule implements Runnable {
                         if (rtData[index] > 1.0) {
                             rtData[index] = 1.0;
                         }
-                        System.out.println(rtData[index]);
+                        //System.out.println(rtData[index]);
                     }
                     //and here rtData needs to be sent
 
@@ -223,7 +231,7 @@ public class AudioModule implements Runnable {
         ArtGUI.reso4.setEnabled(true);
     }
 
-    public double[] toDoubleArray(byte[] byteArray){
+    public static double[] toDoubleArray(byte[] byteArray){
         int times = Double.SIZE / Byte.SIZE;
         double[] doubles = new double[byteArray.length / times];
         for(int i=0;i<doubles.length;i++){
@@ -232,7 +240,7 @@ public class AudioModule implements Runnable {
         return doubles;
     }
 
-    public short[] shortMe(byte[] bytes) {
+    public static short[] shortMe(byte[] bytes) {
         short[] out = new short[bytes.length / 2]; // will drop last byte if odd number
         ByteBuffer bb = ByteBuffer.wrap(bytes);
         for (int i = 0; i < out.length; i++) {
