@@ -13,7 +13,7 @@ import java.nio.ByteBuffer;
 
 public class AudioModule implements Runnable {
 	private static AudioModule LastDec; 
-    int modeOfOp, duration, width, height;
+    int modeOfOp, duration, width, height, algo;
     int max = 1000000;
     boolean recording = false, fullscreen = false;
     private long window;
@@ -135,6 +135,7 @@ public class AudioModule implements Runnable {
             loader.width = width;
             loader.height = height;
             loader.fullscreen = fullscreen;
+            //loader.algo = aglo;
             Thread loaderThread = new Thread(loader);
             loaderThread.start();
 
@@ -150,16 +151,13 @@ public class AudioModule implements Runnable {
             }
             //for real time mode...
             else {
-                duration = 10;
-                //double[] rtData = new double[512];
+
                 for(int i = 0; i < 512; i++) {
                 	rtData[i] = 0;
                 }
-                start = System.currentTimeMillis();
-                end = start + 1000 * duration;
+
                 DoubleFFT_1D dfft = new DoubleFFT_1D(512);
-                while (recording && System.currentTimeMillis() < end && ((len = line.read(rtBuf, 0, rtBuf.length)) != -1)) {
-                    baos.write(rtBuf, 0, len);
+                while (recording && ((len = line.read(rtBuf, 0, rtBuf.length)) != -1)) {
                     //this while loop creates a buf array of 5500 elements every second.
                     //need to send 512 data points 30 times a second somehow...
                     short[] s = shortMe(rtBuf);
@@ -175,13 +173,13 @@ public class AudioModule implements Runnable {
                         }
                         //System.out.println(rtData[index]);
                     }
-                    //and here rtData needs to be sent
-
                 }
+                /*
                 if (System.currentTimeMillis() >= end) {
                     ArtGUI.recordInput.doClick();
                     ArtGUI.infoBox("The max duration has been reached", "Recording Stopped");
                 }
+                */
 
                 recording = false;
             }
