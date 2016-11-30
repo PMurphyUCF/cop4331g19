@@ -6,6 +6,10 @@ import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
+
+import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.util.Random;
 
 public class GLLoader implements Runnable{
@@ -17,8 +21,15 @@ public class GLLoader implements Runnable{
 
 	public int width = 0, height = 0;
 	public boolean fullscreen = false;
+	private volatile boolean running = true;
+
 	public void run() {
+		running = true;
 		runLoader(width, height, fullscreen);
+	}
+
+	public void terminate() {
+		running = false;
 	}
 
 	public void runLoader(int width, int height, boolean fullscreen) {
@@ -194,6 +205,33 @@ public class GLLoader implements Runnable{
             }
         }
     }
+
+	public void destroyWindow(){
+		try {
+			Robot robot = new Robot();
+
+			// Simulate a mouse click
+			robot.mousePress(InputEvent.BUTTON1_MASK);
+			robot.mouseRelease(InputEvent.BUTTON1_MASK);
+
+			robot.delay(100);
+
+			// Simulate a key press
+			robot.keyPress(KeyEvent.VK_ALT);
+			robot.keyPress(KeyEvent.VK_TAB);
+			robot.delay(20);
+			robot.keyRelease(KeyEvent.VK_ALT);
+			robot.keyRelease(KeyEvent.VK_TAB);
+
+			robot.delay(100);
+
+			robot.keyPress(KeyEvent.VK_ESCAPE);
+			robot.keyRelease(KeyEvent.VK_ESCAPE);
+
+		} catch (AWTException e) {
+			e.printStackTrace();
+		}
+	}
     
 	
 	/*public static void main(String[] args) {

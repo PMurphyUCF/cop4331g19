@@ -2,7 +2,10 @@ import org.jtransforms.fft.DoubleFFT_1D;
 
 import javax.sound.sampled.*;
 
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
+import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
+import static org.lwjgl.glfw.GLFW.glfwTerminate;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
@@ -121,6 +124,10 @@ public class AudioModule implements Runnable {
             //no more mode-specific stuff
             enableButtons();
 
+            loader.destroyWindow();
+            loader.terminate();
+            loaderThread.join();
+
             line.stop();
             line.close();
 
@@ -175,10 +182,6 @@ public class AudioModule implements Runnable {
             out[i] = bb.getShort();
         }
         return out;
-    }
-
-    private void destroyWindow(){
-    	glfwDestroyWindow(window);
     }
     
 }
