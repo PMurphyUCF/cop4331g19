@@ -267,6 +267,7 @@ public class ArtGUI extends JApplet implements ActionListener {
 				System.out.println("Saving...");
 				//all that's needed to save the image..
 				module.saveImage();
+				infoBox("Image saved to your Pictures directory", "Saved Image");
 				break;
 			default:
 				System.out.println(e.getActionCommand());

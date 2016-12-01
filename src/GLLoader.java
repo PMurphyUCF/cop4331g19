@@ -208,7 +208,7 @@ public class GLLoader implements Runnable{
 					float rn = (float) tmp[(i + k*64) % 512];
 					float rn1 = (float) tmp[(i + k*64) % 512];
 					float rn2 = (float) tmp[(i + k*64) % 512];
-	                System.out.printf("vals %d, %f\n", (i + k*64) % 512, tmp[(i + k*64) % 512]);
+	                //System.out.printf("vals %d, %f\n", (i + k*64) % 512, tmp[(i + k*64) % 512]);
 					glBegin(GL_QUADS);
 					glColor3f(rn,rn1,rn2);
 			        glVertex2i(storage[i][k].bl.x,storage[i][k].bl.y); //bottom-left vertex
