@@ -280,8 +280,9 @@ public class AudioModule implements Runnable {
     }
 
     //method that changes teh takeScreenshot boolean to take the screenshot and save it
-    public void saveImage() {
+    public void saveImage(String format) {
         try {
+            loader.format = format;
             loader.takeScreenshot = true;
         }
         catch (NullPointerException n) {

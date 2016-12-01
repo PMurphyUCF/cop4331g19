@@ -31,6 +31,7 @@ public class GLLoader implements Runnable{
 	
 	public int width = 0, height = 0, algo = 0, mode = 0;
 	public boolean fullscreen = false, takeScreenshot = false;
+	public String format;
 	private volatile boolean running = true;
 	private quaddata storage[][];
 	private float alphaChannels[][] = new float[xArrayVal][yArrayVal];
@@ -210,7 +211,6 @@ public class GLLoader implements Runnable{
 					float rn = (float) tmp[(i + k*64) % 512];
 					float rn1 = (float) tmp[(i + k*64) % 512];
 					float rn2 = (float) tmp[(i + k*64) % 512];
-	               // System.out.printf("vals %d, %f\n", (i + k*64) % 512, tmp[(i + k*64) % 512]);
 					glBegin(GL_QUADS);
 					glColor3f(rn,rn1,rn2);
 			        glVertex2i(storage[i][k].bl.x,storage[i][k].bl.y); //bottom-left vertex
@@ -755,9 +755,9 @@ public class GLLoader implements Runnable{
 			}
 		}
 
-		dir += "\\ScreenCapture-" + System.currentTimeMillis() + ".png";
+		dir += "\\ScreenCapture-" + System.currentTimeMillis() + "." + format;
 		File file = new File(dir);
-		String format = "PNG";
+		format = format.toUpperCase();
 		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
 		for (int x=0; x<width; x++) {

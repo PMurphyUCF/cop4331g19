@@ -9,7 +9,7 @@ public class ArtGUI extends JApplet implements ActionListener {
 
 	//false when not recording, true when recording
 	public static boolean recordState = false;
-	public static JButton recordInput, saveImage;
+	public static JButton recordInput, savePngImage, saveJpgImage;
 	public static JSlider slider;
 	private ButtonGroup algorithmOption, modeOption, resolutionOption;
 	static JRadioButton staticImage, realImage, algo1, algo2, algo3, algo4, reso1, reso2, reso3, reso4;
@@ -95,13 +95,13 @@ public class ArtGUI extends JApplet implements ActionListener {
 	}
 	
 	private void createSouthPanel(){
-		
+
 		JPanel southPanel = new JPanel(new GridLayout(3, 1));
 		JPanel top = new JPanel();
 		JPanel mid = new JPanel();
 		JPanel bottom = new JPanel();
         add(southPanel,BorderLayout.SOUTH);
-        
+
         recordInput = new JButton("Record Input");
         recordInput.setPreferredSize(new Dimension(170, 60));
         recordInput.setMinimumSize(new Dimension(170, 60));
@@ -109,7 +109,7 @@ public class ArtGUI extends JApplet implements ActionListener {
 		recordInput.setActionCommand("recordInput");
 		recordInput.addActionListener(this);
 		top.add(recordInput);
-        
+
         modeOption = new ButtonGroup();
         staticImage = new JRadioButton("Static Image");
         realImage = new JRadioButton("Real Time Image");
@@ -118,14 +118,22 @@ public class ArtGUI extends JApplet implements ActionListener {
 
 		top.add(staticImage);
 		top.add(realImage);
-        
-        saveImage = new JButton("Save Image");
-        saveImage.setPreferredSize(new Dimension(170, 60));
-        saveImage.setMinimumSize(new Dimension(170, 60));
-        saveImage.setMaximumSize(new Dimension(170, 60));
-		saveImage.setActionCommand("saveImage");
-		saveImage.addActionListener(this);
-		top.add(saveImage);
+
+		savePngImage = new JButton("<html><center>"+"Save"+"<br>"+"PNG"+"<br>"+"Image"+"</center></html>");
+		savePngImage.setPreferredSize(new Dimension(80, 60));
+		savePngImage.setMinimumSize(new Dimension(80, 60));
+		savePngImage.setMaximumSize(new Dimension(80, 60));
+		savePngImage.setActionCommand("savePngImage");
+		savePngImage.addActionListener(this);
+		top.add(savePngImage);
+
+		saveJpgImage = new JButton("<html><center>"+"Save"+"<br>"+"JPG"+"<br>"+"Image"+"</center></html>");
+		saveJpgImage.setPreferredSize(new Dimension(80, 60));
+		saveJpgImage.setMinimumSize(new Dimension(80, 60));
+		saveJpgImage.setMaximumSize(new Dimension(80, 60));
+		saveJpgImage.setActionCommand("saveJpgImage");
+		saveJpgImage.addActionListener(this);
+		top.add(saveJpgImage);
 
 		slider = new JSlider(JSlider.HORIZONTAL, 1, 10, 5);
 		//slider.setMinorTickSpacing(2);
@@ -262,11 +270,15 @@ public class ArtGUI extends JApplet implements ActionListener {
 					module.recording = false;
 				}
 				break;
-			case "saveImage":
+			case "savePngImage":
 				//save the image
-				System.out.println("Saving...");
-				//all that's needed to save the image..
-				module.saveImage();
+				module.saveImage("png");
+				infoBox("Image saved to your Pictures directory", "Saved Image");
+				break;
+			case "saveJpgImage":
+				//save the image
+				module.saveImage("jpg");
+				infoBox("Image saved to your Pictures directory", "Saved Image");
 				break;
 			default:
 				System.out.println(e.getActionCommand());
