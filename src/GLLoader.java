@@ -31,7 +31,7 @@ public class GLLoader implements Runnable{
 	private colorquad colorChannelsActive[][] = new colorquad[xArrayVal][yArrayVal];
 	private static final int[] xmove = {0,1,0,-1};
 	private static final int[] ymove = {-1,0,1,0};
-	
+	private static int[] AudioData = new int[512];
 	
 	public void run() {
 		running = true;
@@ -88,6 +88,7 @@ public class GLLoader implements Runnable{
 	public long windowReturn(){
 		return window;
 	}
+	
 	private void init(int WIDTH, int HEIGHT, boolean FULLSCREEN) {
 		// Setup an error callback. The default implementation
 		// will print the error message in System.err.
@@ -153,6 +154,7 @@ public class GLLoader implements Runnable{
 		// the window or has pressed the ESCAPE key.
 		int frame =0;
 		while ( !glfwWindowShouldClose(window) ) {
+			audioProc();
 			draw();	
 			frame++;
 			if(frame%2==0){
@@ -187,12 +189,11 @@ public class GLLoader implements Runnable{
 		else {
 			tmp = AudioModule.relData;
 		}
-
-		Random Random = new Random() ; 
+ 
 		switch (algo){
 			case 0:
-			for(int i=0;i<64;i++){
-				for(int k=0;k<32;k++){
+			for(int i=0;i<xArrayVal;i++){
+				for(int k=0;k<yArrayVal;k++){
 					float rn = (float) tmp[(i + k*64) % 512];
 					float rn1 = (float) tmp[(i + k*64) % 512];
 					float rn2 = (float) tmp[(i + k*64) % 512];
@@ -211,6 +212,9 @@ public class GLLoader implements Runnable{
 			}
 			break;
 			case 1:
+			for(int a=0;a<512;a++){
+				
+			}
 			for(int i=0;i<xArrayVal;i++){
 				for(int k=0;k<yArrayVal;k++){
 					glBegin(GL_QUADS);
@@ -223,6 +227,9 @@ public class GLLoader implements Runnable{
 				}
 			}
 			break;
+			
+			
+			
 			
 		}
 
@@ -296,6 +303,32 @@ public class GLLoader implements Runnable{
 				}
 			}
 		}
+	}
+	
+	private void audioProc(){
+		for(int i=0; i<512 ; i++){
+				if(AudioModule.relData[i] <= 0.05d){
+					AudioData[i] =0;	
+				}
+				else{
+					if(AudioModule.relData[i] > 0.05d){
+						AudioData[i] =1;	
+					}
+					if(AudioModule.relData[i] >= 0.4d){
+						AudioData[i] =2;	
+					}
+					if(AudioModule.relData[i] >= 0.6d){
+						AudioData[i] =3;	
+					}	
+
+					if(AudioModule.relData[i] >= 0.9d){
+						AudioData[i] =4;	
+					}
+					
+					
+				}
+		//	AudioData[i] = (float) AudioModule.relData[i];
+		}		
 	}
 	
 	private void vertexArrayFillerInit(){
