@@ -201,9 +201,9 @@ public class AudioModule implements Runnable {
                             rtData[index] = 1.0;
                         }
                         relData[index] = Math.abs(oldRtData[index] - rtData[index]);
+                        oldRtData[index] = rtData[index];
                         //System.out.println(rtData[index]);
                     }
-                    oldRtData = rtData;
                 }
                 /*
                 if (System.currentTimeMillis() >= end) {

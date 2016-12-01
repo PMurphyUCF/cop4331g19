@@ -185,7 +185,7 @@ public class GLLoader implements Runnable{
 			tmp = AudioModule.staticData;
 		}
 		else {
-			tmp = AudioModule.rtData;
+			tmp = AudioModule.relData;
 		}
 
 		Random Random = new Random() ; 
