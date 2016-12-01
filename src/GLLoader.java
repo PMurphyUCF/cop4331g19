@@ -232,6 +232,10 @@ public class GLLoader implements Runnable{
 					if(pointerA>=xArrayVal*yArrayVal){
 						pointerA=xArrayVal*yArrayVal-1;
 					}
+					if(pointerA<=0){
+						pointerA=0;
+					}
+					//System.out.printf("%d %d %d ",pointerA,pointMapper[pointerA].x, pointMapper[pointerA].y);
 					colorCrawler(pointMapper[pointerA].x,pointMapper[pointerA].y,AudioData[a],colorChannels[pointMapper[pointerA].x][pointMapper[pointerA].y]);
 				}
 			}
@@ -299,6 +303,7 @@ public class GLLoader implements Runnable{
 		if(Magnitude <=0){
 			return;
 		}
+		System.out.printf("%d ", Magnitude);
 		int ytemp;
 		int xtemp;
 		for(int i=0; i<4; i++)
@@ -308,9 +313,13 @@ public class GLLoader implements Runnable{
 			if (!((xtemp <0) || (xtemp>(xArrayVal-1)) || (ytemp <0) || (ytemp>(yArrayVal-1))))
 			{		
 				colorChannelsActive[x][y].r = (colorChannelsActive[x][y].r + Color.r)/2;
-				colorCrawler(xtemp, ytemp, Magnitude--, Color);
+				colorChannelsActive[x][y].g = (colorChannelsActive[x][y].g + Color.g)/2;
+				colorChannelsActive[x][y].b = (colorChannelsActive[x][y].b + Color.b)/2;
+				Magnitude--;
+				colorCrawler(xtemp, ytemp, Magnitude, Color);
 			}
 		}
+		return;
 	}
 	
 	private void fadeout(){
