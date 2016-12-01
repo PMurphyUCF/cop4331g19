@@ -166,7 +166,7 @@ public class GLLoader implements Runnable{
 			if(frame==30){
 				frame=0;
 			}
-			sync(5);
+			sync(30);
 		}
 	}
 	
