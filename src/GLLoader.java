@@ -159,7 +159,9 @@ public class GLLoader implements Runnable{
 				alphaFiller();
 			}
 			if(frame%3==0){
-				fadeout();
+				if(algo!=0){
+					fadeout();
+				}
 			}
 			if(frame==30){
 				frame=0;
@@ -207,6 +209,7 @@ public class GLLoader implements Runnable{
 			        glEnd();
 				}
 			}
+			break;
 			case 1:
 			for(int i=0;i<xArrayVal;i++){
 				for(int k=0;k<yArrayVal;k++){
@@ -219,7 +222,7 @@ public class GLLoader implements Runnable{
 			        glEnd();
 				}
 			}
-	
+			break;
 			
 		}
 
