@@ -13,6 +13,13 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Random;
 
+import javax.imageio.ImageIO;
+
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+
 public class GLLoader implements Runnable{
 
 	// The window handle
@@ -23,7 +30,7 @@ public class GLLoader implements Runnable{
 	private int yArrayVal =32;
 	
 	public int width = 0, height = 0, algo = 0, mode = 0;
-	public boolean fullscreen = false;
+	public boolean fullscreen = false, takeScreenshot = false;;
 	private volatile boolean running = true;
 	private quaddata storage[][];
 	private float alphaChannels[][] = new float[xArrayVal][yArrayVal];
@@ -31,7 +38,8 @@ public class GLLoader implements Runnable{
 	private colorquad colorChannelsActive[][] = new colorquad[xArrayVal][yArrayVal];
 	private static final int[] xmove = {0,1,0,-1};
 	private static final int[] ymove = {-1,0,1,0};
-	private static int[] AudioData = new int[512];
+	private int[] AudioData = new int[512];
+	private point pointMapper[];
 	
 	public void run() {
 		running = true;
@@ -169,6 +177,9 @@ public class GLLoader implements Runnable{
 				frame=0;
 			}
 			sync(30);
+			if (takeScreenshot) {
+				saveImage();
+			}
 		}
 	}
 	
@@ -212,8 +223,17 @@ public class GLLoader implements Runnable{
 			}
 			break;
 			case 1:
+			int pointerA;
+			int rand;
 			for(int a=0;a<512;a++){
-				
+				if(AudioData[a]!=0){
+					rand = (int) Math.floor(Math.random() * 2) -1;
+					pointerA = a*4 + rand;
+					if(pointerA>=xArrayVal*yArrayVal){
+						pointerA=xArrayVal*yArrayVal-1;
+					}
+					colorCrawler(pointMapper[pointerA].x,pointMapper[pointerA].y,AudioData[a],colorChannels[pointMapper[pointerA].x][pointMapper[pointerA].y]);
+				}
 			}
 			for(int i=0;i<xArrayVal;i++){
 				for(int k=0;k<yArrayVal;k++){
@@ -242,15 +262,22 @@ public class GLLoader implements Runnable{
 	
 	private void arrayFiller(){
 		storage = new quaddata[xArrayVal][yArrayVal];
+		pointMapper = new point[xArrayVal*yArrayVal];
 		int SIZE=16; 
 		int PADDING_HALF=2;	
 		int x=0;
 		int y=0;
+		int tracker=0;
 		for(int i=0;i<xArrayVal;i++){
 			x++;
 			y=0;
 			for(int k=0;k<yArrayVal;k++){
 				y++;
+				point cur = new point();
+				cur.x=i;
+				cur.y=k;
+				pointMapper[tracker]=cur;
+				tracker++;
 				storage[i][k] = new quaddata();
 		        storage[i][k].bl.x = SIZE*(x-1) + PADDING_HALF;
 		        storage[i][k].bl.y = SIZE*(y-1) + PADDING_HALF;
@@ -279,7 +306,7 @@ public class GLLoader implements Runnable{
 			xtemp = x+xmove[i];
 			ytemp = y+ymove[i];
 			if (!((xtemp <0) || (xtemp>(xArrayVal-1)) || (ytemp <0) || (ytemp>(yArrayVal-1))))
-			{
+			{		
 				colorChannelsActive[x][y].r = (colorChannelsActive[x][y].r + Color.r)/2;
 				colorCrawler(xtemp, ytemp, Magnitude--, Color);
 			}
@@ -460,7 +487,51 @@ public class GLLoader implements Runnable{
 			e.printStackTrace();
 		}
 	}
-    
+
+    private void saveImage() {
+		glReadBuffer(GL_FRONT);
+		int bpp = 4;
+		ByteBuffer buffer = BufferUtils.createByteBuffer(width * height * bpp);
+		GL11.glReadPixels(0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+
+		String dir = System.getProperty("user.home");
+		dir += "\\Pictures\\SoundVisualizer";
+
+		File directory = new File(dir);
+
+		if (!directory.exists()) {
+			try {
+				directory.mkdir();
+			}
+			catch (SecurityException se) {
+				se.printStackTrace();
+			}
+		}
+
+		dir += "\\ScreenCapture-" + System.currentTimeMillis() + ".png";
+		File file = new File(dir);
+		String format = "PNG";
+		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+		for (int x=0; x<width; x++) {
+			for (int y=0; y<height; y++) {
+				int i = (x + (width * y)) * bpp;
+				int r = buffer.get(i) & 0xFF;
+				int g = buffer.get(i+1) & 0xFF;
+				int b = buffer.get(i+2) & 0xFF;
+				image.setRGB(x, height - (y+1), (0xFF << 24) | (r << 16) | (g << 8) | b);
+			}
+		}
+
+		try {
+			ImageIO.write(image, format, file);
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		takeScreenshot = false;
+	}
 	
 	/*public static void main(String[] args) {
 		new GLLoader().run(1280,720,true);
