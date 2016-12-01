@@ -77,7 +77,7 @@ public class GLLoader implements Runnable{
 	}
 
 	public void runLoader(int width, int height, boolean fullscreen, int algoC) {
-		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
+		System.out.println("Audio Visualizer Gen0.5 V: " + Version.getVersion() + " Proto");
 		arrayFiller();
 		algo = algoC;
 		arrayFiller();
@@ -112,12 +112,15 @@ public class GLLoader implements Runnable{
 		glfwDefaultWindowHints(); // optional, the current window hints are already the default
 		glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // the window will be resizable
-
+		// Get the resolution of the primary monitor
+		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 		// Create the window
 		if(FULLSCREEN==false){
 		window = glfwCreateWindow(WIDTH, HEIGHT, "Visualizer Output", NULL, NULL);
 		}
 		else{
+			WIDTH= vidmode.width();
+			HEIGHT= vidmode.height();
 		window = glfwCreateWindow(WIDTH, HEIGHT, "Visualizer Output", glfwGetPrimaryMonitor(), NULL);
 		}
 		if ( window == NULL )
@@ -129,8 +132,7 @@ public class GLLoader implements Runnable{
 				glfwSetWindowShouldClose(window, true); // We will detect this in our rendering loop
 		});
 
-		// Get the resolution of the primary monitor
-		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
 		// Center our window
 		glfwSetWindowPos(
 			window,
@@ -451,24 +453,25 @@ public class GLLoader implements Runnable{
 	}
 	
 	private void audioProc(){
-		switch (algo){
-		case 0:
-			for(int i=0; i<512 ; i++){
-					if(AudioModule.relData[i] <= 0.25d){
+		if(mode==1){
+				double[] tmp;
+					tmp = AudioModule.staticData;
+				for(int i=0; i<512 ; i++){
+					if(AudioModule.staticData[i] <= 0.25d){
 						AudioData[i] =0;	
 					}
 					else{
-						if(AudioModule.relData[i] > 0.25d){
+						if(AudioModule.staticData[i] > 0.25d){
 							AudioData[i] =1;	
 						}
-						if(AudioModule.relData[i] >= 0.4d){
+						if(AudioModule.staticData[i] >= 0.4d){
 							AudioData[i] =2;	
 						}
-						if(AudioModule.relData[i] >= 0.6d){
+						if(AudioModule.staticData[i] >= 0.6d){
 							AudioData[i] =3;	
 						}	
 	
-						if(AudioModule.relData[i] >= 0.9d){
+						if(AudioModule.staticData[i] >= 0.9d){
 							AudioData[i] =4;	
 						}
 						
@@ -476,53 +479,83 @@ public class GLLoader implements Runnable{
 					}
 			//	AudioData[i] = (float) AudioModule.relData[i];
 			}	
-			break;
-		case 1:
-			for(int i=0; i<512 ; i++){
-					if(AudioModule.relData[i] <= 0.25d){
-						AudioData[i] =0;	
-					}
-					else{
-						if(AudioModule.relData[i] > 0.25d){
-							AudioData[i] =1;	
+		}
+		else
+		{
+			switch (algo){
+			case 0:
+				for(int i=0; i<512 ; i++){
+						if(AudioModule.relData[i] <= 0.25d){
+							AudioData[i] =0;	
 						}
-						if(AudioModule.relData[i] >= 0.4d){
-							AudioData[i] =2;	
+						else{
+							if(AudioModule.relData[i] > 0.25d){
+								AudioData[i] =1;	
+							}
+							if(AudioModule.relData[i] >= 0.4d){
+								AudioData[i] =2;	
+							}
+							if(AudioModule.relData[i] >= 0.6d){
+								AudioData[i] =3;	
+							}	
+		
+							if(AudioModule.relData[i] >= 0.9d){
+								AudioData[i] =4;	
+							}
+							
+							
 						}
-						if(AudioModule.relData[i] >= 0.6d){
-							AudioData[i] =3;	
-						}	
-	
-						if(AudioModule.relData[i] >= 0.9d){
-							AudioData[i] =4;	
+				//	AudioData[i] = (float) AudioModule.relData[i];
+				}	
+				break;
+			case 1:
+				for(int i=0; i<512 ; i++){
+						if(AudioModule.relData[i] <= 0.25d){
+							AudioData[i] =0;	
 						}
-						
-						
-					}
-			//	AudioData[i] = (float) AudioModule.relData[i];
-			}	
-			break;
-		case 2:
-			for(int i=0; i<512 ; i++){
-					if(AudioModule.relData[i] <= 0.3d){
-						AudioData[i] =0;	
-					}
-					else{
-						if(AudioModule.relData[i] > 0.3d){
-							AudioData[i] =1;	
+						else{
+							if(AudioModule.relData[i] > 0.25d){
+								AudioData[i] =1;	
+							}
+							if(AudioModule.relData[i] >= 0.4d){
+								AudioData[i] =2;	
+							}
+							if(AudioModule.relData[i] >= 0.6d){
+								AudioData[i] =3;	
+							}	
+		
+							if(AudioModule.relData[i] >= 0.9d){
+								AudioData[i] =4;	
+							}
+							
+							
 						}
-						if(AudioModule.relData[i] >= 0.4d){
-							AudioData[i] =2;	
+				//	AudioData[i] = (float) AudioModule.relData[i];
+				}	
+				break;
+			case 2:
+				for(int i=0; i<512 ; i++){
+						if(AudioModule.relData[i] <= 0.3d){
+							AudioData[i] =0;	
 						}
-						if(AudioModule.relData[i] >= 0.8d){
-							AudioData[i] =4;	
-						}	
-						
-						
-					}
-			//	AudioData[i] = (float) AudioModule.relData[i];
-			}	
-			break;
+						else{
+							if(AudioModule.relData[i] > 0.3d){
+								AudioData[i] =1;	
+							}
+							if(AudioModule.relData[i] >= 0.4d){
+								AudioData[i] =2;	
+							}
+							if(AudioModule.relData[i] >= 0.8d){
+								AudioData[i] =4;	
+							}	
+							
+							
+						}
+				//	AudioData[i] = (float) AudioModule.relData[i];
+				}	
+				break;
+			}
+			
 		}
 		
 	}
@@ -607,8 +640,7 @@ public class GLLoader implements Runnable{
 					alphaChannels[i][k]=1.0f;
 					colorquad colors = new colorquad();
 					colorquad colorsActive = new colorquad();
-					float wow = (float) Math.floor(Math.random() * i) -1;
-					theta = (float) i * k * wow;
+					theta = (float) ( ((i*k - 0) * 255) / (xArrayVal*yArrayVal - 0) + 0 )*3;
 				    while (theta < 0){
 				    	theta += 360;
 				    }	        			 
@@ -644,18 +676,52 @@ public class GLLoader implements Runnable{
 	private void alphaFiller(){
 		float alpha;
 		Random Random = new Random() ;
-		for(int i =0; i<xArrayVal; i++){
-			for(int k=0; k<yArrayVal;k++){
-				int seed = Random.nextInt(1000);
-				alpha = alphaChannels[i][k]  + noise.noise(i+seed,k+seed)/8;
-				if(alpha >= 1.0f || alpha <= 0.0f ){
-					alphaChannels[i][k] = 1.0f;
+		switch (algo){
+		case 0:
+			for(int i =0; i<xArrayVal; i++){
+				for(int k=0; k<yArrayVal;k++){
+					int seed = Random.nextInt(1000);
+					alpha = alphaChannels[i][k]  + noise.noise(i+seed,k+seed)/8;
+					if(alpha >= 1.0f || alpha <= 0.0f ){
+						alphaChannels[i][k] = 1.0f;
+					}
+					else{
+						alphaChannels[i][k]=alpha;
+					}		
 				}
-				else{
-					alphaChannels[i][k]=alpha;
-				}		
 			}
+			break;
+		case 1:
+			for(int i =0; i<xArrayVal; i++){
+				for(int k=0; k<yArrayVal;k++){
+					int seed = Random.nextInt(1000);
+					alpha = alphaChannels[i][k]  + noise.noise(i+seed,k+seed)/8;
+					if(alpha >= 1.0f || alpha <= 0.0f ){
+						alphaChannels[i][k] = 1.0f;
+					}
+					else{
+						alphaChannels[i][k]=alpha;
+					}		
+				}
+			}
+			break;
+		case 2:
+			for(int i =0; i<xArrayVal; i++){
+				for(int k=0; k<yArrayVal;k++){
+					int seed = Random.nextInt(1000);
+					alpha = alphaChannels[i][k]  + noise.noise(i+seed,k+seed)/16;
+					if(alpha >= 1.0f || alpha <= 0.0f ){
+						alphaChannels[i][k] = 1.0f;
+					}
+					else{
+						alphaChannels[i][k]=alpha;
+					}		
+				}
+			}
+			break;
 		}
+
+		
 	}
 	
 	
