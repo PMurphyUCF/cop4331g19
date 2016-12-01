@@ -34,6 +34,7 @@ public class GLLoader implements Runnable{
 	public String format;
 	private volatile boolean running = true;
 	private quaddata storage[][];
+	private quaddata wiggle[][];
 	private float alphaChannels[][] = new float[xArrayVal][yArrayVal];
 	private colorquad colorChannels[][] = new colorquad[xArrayVal][yArrayVal];
 	private colorquad colorChannelsActive[][] = new colorquad[xArrayVal][yArrayVal];
@@ -159,12 +160,14 @@ public class GLLoader implements Runnable{
 		GL.createCapabilities();
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		glOrtho(0, 640, 0, 640*windowH/windowW, 1, -1);
+		glOrtho(0, xArrayVal*10, 0, xArrayVal*10*windowH/windowW, 1, -1);
 		glMatrixMode(GL_MODELVIEW);
 		//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );   wireframemode
 		glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		// the window or has pressed the ESCAPE key.
 		int frame =0;
+		int ticktock=0;
+		boolean trigger = false;
 		while ( !glfwWindowShouldClose(window) ) {
 			audioProc();
 			draw();	
@@ -175,6 +178,18 @@ public class GLLoader implements Runnable{
 			if(frame%3==0){
 				if(algo!=0){
 					fadeout();
+				}
+			}
+			if(frame % 15 == 0){
+				trigger =true;
+				arrayFillerWiggle();
+			}
+			if(trigger == true){
+				ticktock++;
+				if(ticktock>=4){
+					ticktock=0;
+					trigger =false;
+					arrayFillerWiggleReset();
 				}
 			}
 			if(frame==30){
@@ -283,7 +298,35 @@ public class GLLoader implements Runnable{
 				}
 			}
 			break;
-			
+			case 3:
+			glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
+			for(int a=0;a<512;a++){
+				if(AudioData[a]!=0){
+					rand = (int) Math.floor(Math.random() * 2) -1;
+					pointerA = a*4 + rand;
+					if(pointerA>=xArrayVal*yArrayVal){
+						pointerA=xArrayVal*yArrayVal-1;
+					}
+					if(pointerA<=0){
+						pointerA=0;
+					}
+					//System.out.printf("%d %d %d ",pointerA,pointMapper[pointerA].x, pointMapper[pointerA].y);
+					colorCrawler2(pointMapper[pointerA].x,pointMapper[pointerA].y,AudioData[a],colorChannels[pointMapper[pointerA].x][pointMapper[pointerA].y]);
+					boolreset();
+				}
+			}		
+			for(int i=0;i<xArrayVal;i++){
+				for(int k=0;k<yArrayVal;k++){
+					glBegin(GL_QUADS);
+					glColor4f(colorChannelsActive[i][k].r,colorChannelsActive[i][k].g,colorChannelsActive[i][k].b,alphaChannels[i][k]);
+			        glVertex2i((storage[i][k].bl.x+wiggle[i][k].bl.x)/2,(storage[i][k].bl.y+wiggle[i][k].bl.y)/2); //bottom-left vertex
+			        glVertex2i((storage[i][k].br.x+wiggle[i][k].br.x)/2,(storage[i][k].br.y+wiggle[i][k].br.y)/2); //bottom-right vertex
+			        glVertex2i((storage[i][k].tr.x+wiggle[i][k].tr.x)/2,(storage[i][k].tr.y+wiggle[i][k].tr.y)/2); //top-right vertex
+			        glVertex2i((storage[i][k].tl.x+wiggle[i][k].tl.x)/2,(storage[i][k].tl.y+wiggle[i][k].tl.y)/2); //top-left vertex
+			        glEnd();
+				}
+			}
+			break;
 			
 			
 		}
@@ -306,6 +349,7 @@ public class GLLoader implements Runnable{
 	
 	private void arrayFiller(){
 		storage = new quaddata[xArrayVal][yArrayVal];
+		wiggle = new quaddata[xArrayVal][yArrayVal];
 		pointMapper = new point[xArrayVal*yArrayVal];
 		int SIZE=16; 
 		int PADDING_HALF=2;	
@@ -323,6 +367,7 @@ public class GLLoader implements Runnable{
 				pointMapper[tracker]=cur;
 				tracker++;
 				storage[i][k] = new quaddata();
+				wiggle [i][k] = new quaddata();
 		        storage[i][k].bl.x = SIZE*(x-1) + PADDING_HALF;
 		        storage[i][k].bl.y = SIZE*(y-1) + PADDING_HALF;
 		       
@@ -334,6 +379,74 @@ public class GLLoader implements Runnable{
 		        
 		        storage[i][k].tl.x = SIZE*(x-1) + PADDING_HALF;
 		        storage[i][k].tl.y = SIZE*y - PADDING_HALF;
+		      
+		        wiggle[i][k].bl.x = SIZE*(x-1) + PADDING_HALF;
+		        wiggle[i][k].bl.y = SIZE*(y-1) + PADDING_HALF;
+		       
+		        wiggle[i][k].br.x = SIZE*x - PADDING_HALF;
+		        wiggle[i][k].br.y = SIZE*(y-1) + PADDING_HALF;
+		        
+		        wiggle[i][k].tr.x = SIZE*x - PADDING_HALF;
+		        wiggle[i][k].tr.y = SIZE*y - PADDING_HALF;
+		        
+		        wiggle[i][k].tl.x = SIZE*(x-1) + PADDING_HALF;
+		        wiggle[i][k].tl.y = SIZE*y - PADDING_HALF;
+			}
+		}
+	}
+	
+	private void arrayFillerWiggle(){
+		Random Random = new Random() ;
+		int SIZE=16; 
+		int PADDING_HALF=2;	
+		int x=0;
+		int y=0;
+		int tracker=0;
+		for(int i=0;i<xArrayVal;i++){
+			x++;
+			y=0;
+			for(int k=0;k<yArrayVal;k++){
+				y++;
+				tracker++;
+				wiggle[i][k].bl.x = SIZE*(x-1) + PADDING_HALF + Random.nextInt(4);
+				wiggle[i][k].bl.y = SIZE*(y-1) + PADDING_HALF + Random.nextInt(4);
+		       
+				wiggle[i][k].br.x = SIZE*x - PADDING_HALF + Random.nextInt(4);
+				wiggle[i][k].br.y = SIZE*(y-1) + PADDING_HALF + Random.nextInt(4);
+		        
+				wiggle[i][k].tr.x = SIZE*x - PADDING_HALF + Random.nextInt(4);
+				wiggle[i][k].tr.y = SIZE*y - PADDING_HALF + Random.nextInt(4);
+		        
+				wiggle[i][k].tl.x = SIZE*(x-1) + PADDING_HALF + Random.nextInt(4);
+				wiggle[i][k].tl.y = SIZE*y - PADDING_HALF + Random.nextInt(4);
+		      
+			}
+		}
+	}
+	
+	private void arrayFillerWiggleReset(){
+		int SIZE=16; 
+		int PADDING_HALF=2;	
+		int x=0;
+		int y=0;
+		int tracker=0;
+		for(int i=0;i<xArrayVal;i++){
+			x++;
+			y=0;
+			for(int k=0;k<yArrayVal;k++){
+				y++;
+				tracker++;
+				wiggle[i][k].bl.x = SIZE*(x-1) + PADDING_HALF;
+				wiggle[i][k].bl.y = SIZE*(y-1) + PADDING_HALF;
+		       
+				wiggle[i][k].br.x = SIZE*x - PADDING_HALF;
+				wiggle[i][k].br.y = SIZE*(y-1) + PADDING_HALF;
+		        
+				wiggle[i][k].tr.x = SIZE*x - PADDING_HALF;
+				wiggle[i][k].tr.y = SIZE*y - PADDING_HALF;
+		        
+				wiggle[i][k].tl.x = SIZE*(x-1) + PADDING_HALF;
+				wiggle[i][k].tl.y = SIZE*y - PADDING_HALF;
 		      
 			}
 		}
@@ -451,6 +564,24 @@ public class GLLoader implements Runnable{
 				}
 			}
 			break;	
+		case 3:
+			for(int i=0;i<xArrayVal;i++){
+				for(int k=0;k<yArrayVal;k++){
+					colorChannelsActive[i][k].r = colorChannelsActive[i][k].r - 0.05f;
+					if(colorChannelsActive[i][k].r<0.0f){
+						colorChannelsActive[i][k].r=0.0f;
+					}
+					colorChannelsActive[i][k].g = colorChannelsActive[i][k].g - 0.05f;
+					if(colorChannelsActive[i][k].g<0.0f){
+						colorChannelsActive[i][k].g=0.0f;
+					}
+					colorChannelsActive[i][k].b = colorChannelsActive[i][k].b - 0.05f;
+					if(colorChannelsActive[i][k].b<0.0f){
+						colorChannelsActive[i][k].b=0.0f;
+					}
+				}
+			}
+			break;
 		}
 	}
 	
@@ -548,7 +679,28 @@ public class GLLoader implements Runnable{
 								AudioData[i] =2;	
 							}
 							if(AudioModule.relData[i] >= 0.8d){
-								AudioData[i] =4;	
+								AudioData[i] =3;	
+							}	
+							
+							
+						}
+				//	AudioData[i] = (float) AudioModule.relData[i];
+				}	
+				break;
+			case 3:
+				for(int i=0; i<512 ; i++){
+						if(AudioModule.relData[i] <= 0.3d){
+							AudioData[i] =0;	
+						}
+						else{
+							if(AudioModule.relData[i] > 0.3d){
+								AudioData[i] =1;	
+							}
+							if(AudioModule.relData[i] >= 0.4d){
+								AudioData[i] =2;	
+							}
+							if(AudioModule.relData[i] >= 0.8d){
+								AudioData[i] =3;	
 							}	
 							
 							
@@ -709,7 +861,41 @@ public class GLLoader implements Runnable{
 				}
 			}
 			break;	
-			
+		
+		case 3:
+			for(int i =0; i<xArrayVal; i++){
+				for(int k=0; k<yArrayVal;k++){
+					alphaChannels[i][k]=1.0f;
+					colorquad colors = new colorquad();
+					colorquad colorsActive = new colorquad();
+					theta = (float) i * k;
+				    while (theta < 0){
+				    	theta += 360;
+				    }	        			 
+				    while (theta >= 360){
+				    	theta -= 360;
+				    }			   	 
+				    if (theta < 120) {
+				    	colors.g = theta / 120;
+				        colors.r = 1 - colors.g;
+				        colors.b = 0;
+				    } else if (theta < 240) {    
+				    	colors.b = (theta - 120) / 120;
+				        colors.g = 1 - colors.b;
+				        colors.r = 0;
+				    } else {
+				    	colors.r = (theta - 240) / 120;
+				    	colors.b = 1 - colors.r;
+				        colors.g = 0;
+				    }
+				    colorsActive.r = 0.0f;
+			    	colorsActive.b = 0.0f;
+			        colorsActive.g = 0.0f;
+					colorChannels[i][k]=colors;
+					colorChannelsActive[i][k]=colorsActive;
+				}
+			}
+			break;
 			
 		}
 	}
@@ -763,6 +949,20 @@ public class GLLoader implements Runnable{
 				for(int k=0; k<yArrayVal;k++){
 					int seed = Random.nextInt(2000);
 					alpha = alphaChannels[i][k]  + noise.noise(i+seed,k+seed)/50;
+					if(alpha >= 1.0f || alpha <= 0.0f ){
+						alphaChannels[i][k] = 1.0f;
+					}
+					else{
+						alphaChannels[i][k]=alpha;
+					}		
+				}
+			}
+			break;
+		case 3:
+			for(int i =0; i<xArrayVal; i++){
+				for(int k=0; k<yArrayVal;k++){
+					int seed = Random.nextInt(1000);
+					alpha = alphaChannels[i][k]  + noise.noise(i+seed,k+seed)/8;
 					if(alpha >= 1.0f || alpha <= 0.0f ){
 						alphaChannels[i][k] = 1.0f;
 					}
