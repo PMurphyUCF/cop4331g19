@@ -36,6 +36,7 @@ public class GLLoader implements Runnable{
 	private float alphaChannels[][] = new float[xArrayVal][yArrayVal];
 	private colorquad colorChannels[][] = new colorquad[xArrayVal][yArrayVal];
 	private colorquad colorChannelsActive[][] = new colorquad[xArrayVal][yArrayVal];
+	private boolean errorChecking[][] = new boolean[xArrayVal][yArrayVal];
 	private static final int[] xmove = {0,1,0,-1};
 	private static final int[] ymove = {-1,0,1,0};
 	private int[] AudioData = new int[512];
@@ -200,7 +201,8 @@ public class GLLoader implements Runnable{
 		else {
 			tmp = AudioModule.relData;
 		}
- 
+		int pointerA;
+		int rand;
 		switch (algo){
 			case 0:
 			for(int i=0;i<xArrayVal;i++){
@@ -208,7 +210,7 @@ public class GLLoader implements Runnable{
 					float rn = (float) tmp[(i + k*64) % 512];
 					float rn1 = (float) tmp[(i + k*64) % 512];
 					float rn2 = (float) tmp[(i + k*64) % 512];
-	                System.out.printf("vals %d, %f\n", (i + k*64) % 512, tmp[(i + k*64) % 512]);
+	               // System.out.printf("vals %d, %f\n", (i + k*64) % 512, tmp[(i + k*64) % 512]);
 					glBegin(GL_QUADS);
 					glColor3f(rn,rn1,rn2);
 			        glVertex2i(storage[i][k].bl.x,storage[i][k].bl.y); //bottom-left vertex
@@ -223,8 +225,6 @@ public class GLLoader implements Runnable{
 			}
 			break;
 			case 1:
-			int pointerA;
-			int rand;
 			for(int a=0;a<512;a++){
 				if(AudioData[a]!=0){
 					rand = (int) Math.floor(Math.random() * 2) -1;
@@ -251,7 +251,34 @@ public class GLLoader implements Runnable{
 				}
 			}
 			break;
-			
+			case 2:
+			for(int a=0;a<512;a++){
+				if(AudioData[a]!=0){
+					rand = (int) Math.floor(Math.random() * 2) -1;
+					pointerA = a*4 + rand;
+					if(pointerA>=xArrayVal*yArrayVal){
+						pointerA=xArrayVal*yArrayVal-1;
+					}
+					if(pointerA<=0){
+						pointerA=0;
+					}
+					//System.out.printf("%d %d %d ",pointerA,pointMapper[pointerA].x, pointMapper[pointerA].y);
+					colorCrawler2(pointMapper[pointerA].x,pointMapper[pointerA].y,AudioData[a],colorChannels[pointMapper[pointerA].x][pointMapper[pointerA].y]);
+					boolreset();
+				}
+			}		
+			for(int i=0;i<xArrayVal;i++){
+				for(int k=0;k<yArrayVal;k++){
+					glBegin(GL_QUADS);
+					glColor4f(colorChannelsActive[i][k].r,colorChannelsActive[i][k].g,colorChannelsActive[i][k].b,alphaChannels[i][k]);
+			        glVertex2i(storage[i][k].bl.x,storage[i][k].bl.y); //bottom-left vertex
+			        glVertex2i(storage[i][k].br.x, storage[i][k].br.y); //bottom-right vertex
+			        glVertex2i(storage[i][k].tr.x, storage[i][k].tr.y); //top-right vertex
+			        glVertex2i(storage[i][k].tl.x, storage[i][k].tl.y); //top-left vertex
+			        glEnd();
+				}
+			}
+			break;
 			
 			
 			
@@ -263,6 +290,15 @@ public class GLLoader implements Runnable{
 		glfwSwapBuffers(window);
 		glfwPollEvents();	
 	}
+	
+	private void boolreset(){
+		for(int i=0;i<xArrayVal;i++){		
+			for(int k=0;k<yArrayVal;k++){		
+		      errorChecking[i][k]=false;
+			}
+		}
+	}
+	
 	
 	private void arrayFiller(){
 		storage = new quaddata[xArrayVal][yArrayVal];
@@ -303,7 +339,7 @@ public class GLLoader implements Runnable{
 		if(Magnitude <=0){
 			return;
 		}
-		System.out.printf("%d ", Magnitude);
+		//System.out.printf("%d ", Magnitude);
 		int ytemp;
 		int xtemp;
 		for(int i=0; i<4; i++)
@@ -322,84 +358,286 @@ public class GLLoader implements Runnable{
 		return;
 	}
 	
+	private void colorCrawler2 (int x, int y, int Magnitude, colorquad Color){
+		if(Magnitude <=0 || errorChecking[x][y]==true){
+			return;
+		}
+		//System.out.printf("%d ", Magnitude);
+		int ytemp;
+		int xtemp;
+		if(colorChannelsActive[x][y].r <= 0.05f && colorChannelsActive[x][y].g <= 0.05f && colorChannelsActive[x][y].b <= 0.05f){
+			colorChannelsActive[x][y].r = Color.r;
+			colorChannelsActive[x][y].g = Color.g;
+			colorChannelsActive[x][y].b = Color.b;
+		}
+		else{
+			colorChannelsActive[x][y].r = (colorChannelsActive[x][y].r + Color.r)/2;
+			colorChannelsActive[x][y].g = (colorChannelsActive[x][y].g + Color.g)/2;
+			colorChannelsActive[x][y].b = (colorChannelsActive[x][y].b + Color.b)/2;		
+		}
+		errorChecking[x][y]=true;
+		Magnitude--;
+		for(int i=0; i<4; i++)
+		{	
+			xtemp = x+xmove[i];
+			ytemp = y+ymove[i];
+			
+			if (!((xtemp <0) || (xtemp>(xArrayVal-1)) || (ytemp <0) || (ytemp>(yArrayVal-1))))
+			{						
+				colorCrawler2(xtemp, ytemp, Magnitude, Color);
+			}
+		}
+		return;
+	}
+	
+	
 	private void fadeout(){
-		for(int i=0;i<xArrayVal;i++){
-			for(int k=0;k<yArrayVal;k++){
-				colorChannelsActive[i][k].r = colorChannelsActive[i][k].r - 0.05f;
-				if(colorChannelsActive[i][k].r<0.0f){
-					colorChannelsActive[i][k].r=0.0f;
-				}
-				colorChannelsActive[i][k].g = colorChannelsActive[i][k].g - 0.05f;
-				if(colorChannelsActive[i][k].g<0.0f){
-					colorChannelsActive[i][k].g=0.0f;
-				}
-				colorChannelsActive[i][k].b = colorChannelsActive[i][k].b - 0.05f;
-				if(colorChannelsActive[i][k].b<0.0f){
-					colorChannelsActive[i][k].b=0.0f;
+		switch (algo){
+		case 0:
+			for(int i=0;i<xArrayVal;i++){
+				for(int k=0;k<yArrayVal;k++){
+					colorChannelsActive[i][k].r = colorChannelsActive[i][k].r - 0.1f;
+					if(colorChannelsActive[i][k].r<0.0f){
+						colorChannelsActive[i][k].r=0.0f;
+					}
+					colorChannelsActive[i][k].g = colorChannelsActive[i][k].g - 0.1f;
+					if(colorChannelsActive[i][k].g<0.0f){
+						colorChannelsActive[i][k].g=0.0f;
+					}
+					colorChannelsActive[i][k].b = colorChannelsActive[i][k].b - 0.1f;
+					if(colorChannelsActive[i][k].b<0.0f){
+						colorChannelsActive[i][k].b=0.0f;
+					}
 				}
 			}
+			break;
+		case 1:
+			for(int i=0;i<xArrayVal;i++){
+				for(int k=0;k<yArrayVal;k++){
+					colorChannelsActive[i][k].r = colorChannelsActive[i][k].r - 0.1f;
+					if(colorChannelsActive[i][k].r<0.0f){
+						colorChannelsActive[i][k].r=0.0f;
+					}
+					colorChannelsActive[i][k].g = colorChannelsActive[i][k].g - 0.1f;
+					if(colorChannelsActive[i][k].g<0.0f){
+						colorChannelsActive[i][k].g=0.0f;
+					}
+					colorChannelsActive[i][k].b = colorChannelsActive[i][k].b - 0.1f;
+					if(colorChannelsActive[i][k].b<0.0f){
+						colorChannelsActive[i][k].b=0.0f;
+					}
+				}
+			}
+			break;
+		case 2:
+			for(int i=0;i<xArrayVal;i++){
+				for(int k=0;k<yArrayVal;k++){
+					colorChannelsActive[i][k].r = colorChannelsActive[i][k].r - 0.05f;
+					if(colorChannelsActive[i][k].r<0.0f){
+						colorChannelsActive[i][k].r=0.0f;
+					}
+					colorChannelsActive[i][k].g = colorChannelsActive[i][k].g - 0.05f;
+					if(colorChannelsActive[i][k].g<0.0f){
+						colorChannelsActive[i][k].g=0.0f;
+					}
+					colorChannelsActive[i][k].b = colorChannelsActive[i][k].b - 0.05f;
+					if(colorChannelsActive[i][k].b<0.0f){
+						colorChannelsActive[i][k].b=0.0f;
+					}
+				}
+			}
+			break;	
 		}
 	}
 	
 	private void audioProc(){
-		for(int i=0; i<512 ; i++){
-				if(AudioModule.relData[i] <= 0.05d){
-					AudioData[i] =0;	
-				}
-				else{
-					if(AudioModule.relData[i] > 0.05d){
-						AudioData[i] =1;	
+		switch (algo){
+		case 0:
+			for(int i=0; i<512 ; i++){
+					if(AudioModule.relData[i] <= 0.25d){
+						AudioData[i] =0;	
 					}
-					if(AudioModule.relData[i] >= 0.4d){
-						AudioData[i] =2;	
+					else{
+						if(AudioModule.relData[i] > 0.25d){
+							AudioData[i] =1;	
+						}
+						if(AudioModule.relData[i] >= 0.4d){
+							AudioData[i] =2;	
+						}
+						if(AudioModule.relData[i] >= 0.6d){
+							AudioData[i] =3;	
+						}	
+	
+						if(AudioModule.relData[i] >= 0.9d){
+							AudioData[i] =4;	
+						}
+						
+						
 					}
-					if(AudioModule.relData[i] >= 0.6d){
-						AudioData[i] =3;	
-					}	
-
-					if(AudioModule.relData[i] >= 0.9d){
-						AudioData[i] =4;	
+			//	AudioData[i] = (float) AudioModule.relData[i];
+			}	
+			break;
+		case 1:
+			for(int i=0; i<512 ; i++){
+					if(AudioModule.relData[i] <= 0.25d){
+						AudioData[i] =0;	
 					}
-					
-					
-				}
-		//	AudioData[i] = (float) AudioModule.relData[i];
-		}		
+					else{
+						if(AudioModule.relData[i] > 0.25d){
+							AudioData[i] =1;	
+						}
+						if(AudioModule.relData[i] >= 0.4d){
+							AudioData[i] =2;	
+						}
+						if(AudioModule.relData[i] >= 0.6d){
+							AudioData[i] =3;	
+						}	
+	
+						if(AudioModule.relData[i] >= 0.9d){
+							AudioData[i] =4;	
+						}
+						
+						
+					}
+			//	AudioData[i] = (float) AudioModule.relData[i];
+			}	
+			break;
+		case 2:
+			for(int i=0; i<512 ; i++){
+					if(AudioModule.relData[i] <= 0.3d){
+						AudioData[i] =0;	
+					}
+					else{
+						if(AudioModule.relData[i] > 0.3d){
+							AudioData[i] =1;	
+						}
+						if(AudioModule.relData[i] >= 0.4d){
+							AudioData[i] =2;	
+						}
+						if(AudioModule.relData[i] >= 0.8d){
+							AudioData[i] =4;	
+						}	
+						
+						
+					}
+			//	AudioData[i] = (float) AudioModule.relData[i];
+			}	
+			break;
+		}
+		
 	}
 	
 	private void vertexArrayFillerInit(){
 		float theta;
-		for(int i =0; i<xArrayVal; i++){
-			for(int k=0; k<yArrayVal;k++){
-				alphaChannels[i][k]=1.0f;
-				colorquad colors = new colorquad();
-				colorquad colorsActive = new colorquad();
-				theta = (float) i * k;
-			    while (theta < 0){
-			    	theta += 360;
-			    }	        			 
-			    while (theta >= 360){
-			    	theta -= 360;
-			    }			   	 
-			    if (theta < 120) {
-			    	colors.g = theta / 120;
-			        colors.r = 1 - colors.g;
-			        colors.b = 0;
-			    } else if (theta < 240) {    
-			    	colors.b = (theta - 120) / 120;
-			        colors.g = 1 - colors.b;
-			        colors.r = 0;
-			    } else {
-			    	colors.r = (theta - 240) / 120;
-			    	colors.b = 1 - colors.r;
-			        colors.g = 0;
-			    }
-			    colorsActive.r = 0.0f;
-		    	colorsActive.b = 0.0f;
-		        colorsActive.g = 0.0f;
-				colorChannels[i][k]=colors;
-				colorChannelsActive[i][k]=colorsActive;
+		switch (algo){
+		case 0:
+			for(int i =0; i<xArrayVal; i++){
+				for(int k=0; k<yArrayVal;k++){
+					alphaChannels[i][k]=1.0f;
+					colorquad colors = new colorquad();
+					colorquad colorsActive = new colorquad();
+					theta = (float) i * k;
+				    while (theta < 0){
+				    	theta += 360;
+				    }	        			 
+				    while (theta >= 360){
+				    	theta -= 360;
+				    }			   	 
+				    if (theta < 120) {
+				    	colors.g = theta / 120;
+				        colors.r = 1 - colors.g;
+				        colors.b = 0;
+				    } else if (theta < 240) {    
+				    	colors.b = (theta - 120) / 120;
+				        colors.g = 1 - colors.b;
+				        colors.r = 0;
+				    } else {
+				    	colors.r = (theta - 240) / 120;
+				    	colors.b = 1 - colors.r;
+				        colors.g = 0;
+				    }
+				    colorsActive.r = 0.0f;
+			    	colorsActive.b = 0.0f;
+			        colorsActive.g = 0.0f;
+					colorChannels[i][k]=colors;
+					colorChannelsActive[i][k]=colorsActive;
+				}
 			}
+			break;
+			
+		case 1:
+			for(int i =0; i<xArrayVal; i++){
+				for(int k=0; k<yArrayVal;k++){
+					alphaChannels[i][k]=1.0f;
+					colorquad colors = new colorquad();
+					colorquad colorsActive = new colorquad();
+					theta = (float) i * k;
+				    while (theta < 0){
+				    	theta += 360;
+				    }	        			 
+				    while (theta >= 360){
+				    	theta -= 360;
+				    }			   	 
+				    if (theta < 120) {
+				    	colors.g = theta / 120;
+				        colors.r = 1 - colors.g;
+				        colors.b = 0;
+				    } else if (theta < 240) {    
+				    	colors.b = (theta - 120) / 120;
+				        colors.g = 1 - colors.b;
+				        colors.r = 0;
+				    } else {
+				    	colors.r = (theta - 240) / 120;
+				    	colors.b = 1 - colors.r;
+				        colors.g = 0;
+				    }
+				    colorsActive.r = 0.0f;
+			    	colorsActive.b = 0.0f;
+			        colorsActive.g = 0.0f;
+					colorChannels[i][k]=colors;
+					colorChannelsActive[i][k]=colorsActive;
+				}
+			}
+			break;
+		
+		
+		case 2:
+			for(int i =0; i<xArrayVal; i++){
+				for(int k=0; k<yArrayVal;k++){
+					alphaChannels[i][k]=1.0f;
+					colorquad colors = new colorquad();
+					colorquad colorsActive = new colorquad();
+					float wow = (float) Math.floor(Math.random() * i) -1;
+					theta = (float) i * k * wow;
+				    while (theta < 0){
+				    	theta += 360;
+				    }	        			 
+				    while (theta >= 360){
+				    	theta -= 360;
+				    }			   	 
+				    if (theta < 120) {
+				    	colors.g = theta / 120;
+				        colors.r = 1 - colors.g;
+				        colors.b = 0;
+				    } else if (theta < 240) {    
+				    	colors.b = (theta - 120) / 120;
+				        colors.g = 1 - colors.b;
+				        colors.r = 0;
+				    } else {
+				    	colors.r = (theta - 240) / 120;
+				    	colors.b = 1 - colors.r;
+				        colors.g = 0;
+				    }
+				    colorsActive.r = 0.0f;
+			    	colorsActive.b = 0.0f;
+			        colorsActive.g = 0.0f;
+					colorChannels[i][k]=colors;
+					colorChannelsActive[i][k]=colorsActive;
+				}
+			}
+			break;	
+			
+			
 		}
 	}
 	
@@ -505,9 +743,9 @@ public class GLLoader implements Runnable{
 
 		String dir = System.getProperty("user.home");
 		dir += "\\Pictures\\SoundVisualizer";
-
+		//System.out.printf(dir);
 		File directory = new File(dir);
-
+		
 		if (!directory.exists()) {
 			try {
 				directory.mkdir();
