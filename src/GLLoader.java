@@ -31,6 +31,7 @@ public class GLLoader implements Runnable{
 	
 	public int width = 0, height = 0, algo = 0, mode = 0;
 	public boolean fullscreen = false, takeScreenshot = false;
+	public String format;
 	private volatile boolean running = true;
 	private quaddata storage[][];
 	private float alphaChannels[][] = new float[xArrayVal][yArrayVal];
@@ -303,7 +304,7 @@ public class GLLoader implements Runnable{
 		if(Magnitude <=0){
 			return;
 		}
-		System.out.printf("%d ", Magnitude);
+		//System.out.printf("%d ", Magnitude);
 		int ytemp;
 		int xtemp;
 		for(int i=0; i<4; i++)
@@ -517,9 +518,9 @@ public class GLLoader implements Runnable{
 			}
 		}
 
-		dir += "\\ScreenCapture-" + System.currentTimeMillis() + ".png";
+		dir += "\\ScreenCapture-" + System.currentTimeMillis() + "." + format;
 		File file = new File(dir);
-		String format = "PNG";
+		format = format.toUpperCase();
 		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
 		for (int x=0; x<width; x++) {
