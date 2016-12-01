@@ -36,7 +36,7 @@ public class AudioModule implements Runnable {
     public void run() {
         //run it based on the algorithm number (algoNum)
 
-        if (modeOfOp == 2 && alreadyRan && loaderThread != null) {
+        if (alreadyRan && loader != null) {
             loader.destroyWindow();
             loader.terminate();
             try {
@@ -45,7 +45,8 @@ public class AudioModule implements Runnable {
             catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            alreadyRan = false;
+            //alreadyRan = false;
+            loader = null;
         }
 
         loader = new GLLoader();
@@ -64,7 +65,7 @@ public class AudioModule implements Runnable {
         //getting the audio input in the form of a byte array
         byte[] audioInputBytes = getAudio(duration);
 
-        alreadyRan = (modeOfOp == 1);
+        alreadyRan = true;
 
 
         if (modeOfOp == 1) {
@@ -160,10 +161,11 @@ public class AudioModule implements Runnable {
             loader.fullscreen = fullscreen;
             loader.mode = modeOfOp;
             loader.algo = algo;
+            loaderThread = new Thread(loader);
+            loaderThread.start();
 
             if (!alreadyRan) {
-                loaderThread = new Thread(loader);
-                loaderThread.start();
+                //if ()
             }
 
             //for static mode...
@@ -215,6 +217,7 @@ public class AudioModule implements Runnable {
                 loader.destroyWindow();
                 loader.terminate();
                 loaderThread.join();
+                loader = null;
 
                 ArtGUI.recordState = false;
                 ArtGUI.recordInput.setText("Record Input");
