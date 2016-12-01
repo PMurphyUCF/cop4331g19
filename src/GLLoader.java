@@ -180,16 +180,18 @@ public class GLLoader implements Runnable{
 					fadeout();
 				}
 			}
-			if(frame % 15 == 0){
-				trigger =true;
-				arrayFillerWiggle();
-			}
-			if(trigger == true){
-				ticktock++;
-				if(ticktock>=4){
-					ticktock=0;
-					trigger =false;
-					arrayFillerWiggleReset();
+			if(algo==3){
+				if(frame % 15 == 0){
+					trigger =true;
+					arrayFillerWiggle();
+				}
+				if(trigger == true){
+					ticktock++;
+					if(ticktock>=4){
+						ticktock=0;
+						trigger =false;
+						arrayFillerWiggleReset();
+					}
 				}
 			}
 			if(frame==30){
@@ -863,12 +865,16 @@ public class GLLoader implements Runnable{
 			break;	
 		
 		case 3:
+			int counterC=0;
+			float thetay;
 			for(int i =0; i<xArrayVal; i++){
 				for(int k=0; k<yArrayVal;k++){
 					alphaChannels[i][k]=1.0f;
 					colorquad colors = new colorquad();
 					colorquad colorsActive = new colorquad();
-					theta = (float) i * k;
+					theta = (float) counterC;
+					thetay = (float) k * 10;
+					counterC++;
 				    while (theta < 0){
 				    	theta += 360;
 				    }	        			 
@@ -887,6 +893,25 @@ public class GLLoader implements Runnable{
 				    	colors.r = (theta - 240) / 120;
 				    	colors.b = 1 - colors.r;
 				        colors.g = 0;
+				    }
+				    while (thetay < 0){
+				    	theta += 360;
+				    }	        			 
+				    while (thetay >= 360){
+				    	theta -= 360;
+				    }			   	 
+				    if (thetay < 120) {
+				    	colors.g = (float) (thetay / 120 + colors.g /2.0);
+				        colors.r = (float) (1 - colors.g + colors.r /2.0);
+				        colors.b = (float) (0 + colors.b /2.0);
+				    } else if (thetay < 240) {    
+				    	colors.b = (float) ((thetay - 120) / 120 + colors.b /2.0);
+				        colors.g = (float) (1 - colors.b + colors.g /2.0);
+				        colors.r = (float) (0 + colors.r /2.0);
+				    } else {
+				    	colors.r = (float) ((thetay - 240) / 120 + colors.r /2.0);
+				    	colors.b = (float) (1 - colors.r + colors.b /2.0);
+				        colors.g = (float) (0 + colors.g /2.0);
 				    }
 				    colorsActive.r = 0.0f;
 			    	colorsActive.b = 0.0f;
