@@ -188,7 +188,6 @@ public class GLLoader implements Runnable{
 	}
 	
 	private void draw() {
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 		//setColor(material);	
 		glDisable(GL_LIGHTING);
@@ -208,6 +207,7 @@ public class GLLoader implements Runnable{
 		int rand;
 		switch (algo){
 			case 0:
+			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			for(int i=0;i<xArrayVal;i++){
 				for(int k=0;k<yArrayVal;k++){
 					float rn = (float) tmp[(i + k*64) % 512];
@@ -227,6 +227,7 @@ public class GLLoader implements Runnable{
 			}
 			break;
 			case 1:
+			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			for(int a=0;a<512;a++){
 				if(AudioData[a]!=0){
 					rand = (int) Math.floor(Math.random() * 2) -1;
@@ -254,6 +255,7 @@ public class GLLoader implements Runnable{
 			}
 			break;
 			case 2:
+			glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
 			for(int a=0;a<512;a++){
 				if(AudioData[a]!=0){
 					rand = (int) Math.floor(Math.random() * 2) -1;
@@ -635,34 +637,73 @@ public class GLLoader implements Runnable{
 		
 		
 		case 2:
+			int numRed = 256;
+			int numGreen = 256;
+			int numBlue = 256;
+			int index=0;
+			float palette[][] = new float[1280][3];
+			for (int grn=0; grn<numGreen; grn++)
+			{
+			palette[index][0]=1.0f;
+			palette[index][1]=grn/255.0f;
+			palette[index][2]=0.0f;
+			index=index+1;
+			}
+			index=1*256;
+			for (int red=0; red<numRed; red++)
+			{
+			palette[index][0]=1.0f-red/255.0f;
+			palette[index][1]=1.0f;
+			palette[index][2]=0.0f;
+			index=index+1;
+			}
+			index=2*256;
+			for (int blu=0; blu<numBlue; blu++)
+			{
+			palette[index][0]=0.0f;
+			palette[index][1]=1.0f;
+			palette[index][2]=blu/255.0f;
+			index=index+1;
+			}
+			index=3*256;
+			for (int grn=0; grn<numGreen; grn++)
+			{
+			palette[index][0]=0.0f;
+			palette[index][1]=1.0f-grn/255.0f;
+			palette[index][2]=1.0f;
+			index=index+1;
+			}
+			index=4*256;
+			for (int red=0; red<numRed; red++)
+			{
+			palette[index][0]=red/255.0f;
+			palette[index][1]=0.0f;
+			palette[index][2]=1.0f;
+			index=index+1;
+			}
+			int curIndex=0;
+			float storeIndex=0;
+			int counter=0;
 			for(int i =0; i<xArrayVal; i++){
 				for(int k=0; k<yArrayVal;k++){
+					counter++;
 					alphaChannels[i][k]=1.0f;
 					colorquad colors = new colorquad();
 					colorquad colorsActive = new colorquad();
-					theta = (float) ( ((i*k - 0) * 255) / (xArrayVal*yArrayVal - 0) + 0 )*3;
-				    while (theta < 0){
-				    	theta += 360;
-				    }	        			 
-				    while (theta >= 360){
-				    	theta -= 360;
-				    }			   	 
-				    if (theta < 120) {
-				    	colors.g = theta / 120;
-				        colors.r = 1 - colors.g;
-				        colors.b = 0;
-				    } else if (theta < 240) {    
-				    	colors.b = (theta - 120) / 120;
-				        colors.g = 1 - colors.b;
-				        colors.r = 0;
-				    } else {
-				    	colors.r = (theta - 240) / 120;
-				    	colors.b = 1 - colors.r;
-				        colors.g = 0;
-				    }
+					curIndex = ( (counter) * (1079) / (xArrayVal*yArrayVal));			
+					storeIndex = palette[curIndex][0];
+					//System.out.printf("%d ", curIndex);
+					colors.r = (float) ( ((storeIndex - 0) * 1280) / (xArrayVal*yArrayVal - 0) + 0 );
+					//System.out.printf("%f ", storeIndex);
+					storeIndex = palette[curIndex][1];
+					colors.g = (float) ( ((storeIndex - 0) * 1280) / (xArrayVal*yArrayVal - 0) + 0 );
+					//System.out.printf("%f ", storeIndex);
+					storeIndex = palette[curIndex][2];
+					colors.b = (float) ( ((storeIndex - 0) * 1280) / (xArrayVal*yArrayVal - 0) + 0 );
+					//System.out.printf("%f \n", storeIndex);
 				    colorsActive.r = 0.0f;
-			    	colorsActive.b = 0.0f;
-			        colorsActive.g = 0.0f;
+			    	colorsActive.b = 0.5f;
+			        colorsActive.g = 0.5f;
 					colorChannels[i][k]=colors;
 					colorChannelsActive[i][k]=colorsActive;
 				}
@@ -709,7 +750,19 @@ public class GLLoader implements Runnable{
 			for(int i =0; i<xArrayVal; i++){
 				for(int k=0; k<yArrayVal;k++){
 					int seed = Random.nextInt(1000);
-					alpha = alphaChannels[i][k]  + noise.noise(i+seed,k+seed)/16;
+					alpha = alphaChannels[i][k]  + noise.noise(i+seed,k+seed)/32;
+					if(alpha >= 1.0f || alpha <= 0.0f ){
+						alphaChannels[i][k] = 1.0f;
+					}
+					else{
+						alphaChannels[i][k]=alpha;
+					}		
+				}
+			}
+			for(int i =0; i<xArrayVal; i++){
+				for(int k=0; k<yArrayVal;k++){
+					int seed = Random.nextInt(2000);
+					alpha = alphaChannels[i][k]  + noise.noise(i+seed,k+seed)/50;
 					if(alpha >= 1.0f || alpha <= 0.0f ){
 						alphaChannels[i][k] = 1.0f;
 					}
