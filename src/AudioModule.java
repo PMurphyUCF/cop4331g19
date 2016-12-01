@@ -281,7 +281,12 @@ public class AudioModule implements Runnable {
 
     //method that changes teh takeScreenshot boolean to take the screenshot and save it
     public void saveImage() {
-        loader.takeScreenshot = true;
+        try {
+            loader.takeScreenshot = true;
+        }
+        catch (NullPointerException n) {
+            ArtGUI.infoBox("No Image available to save", "Unable to Perform Action");
+        }
     }
     
 }
