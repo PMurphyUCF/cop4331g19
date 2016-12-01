@@ -278,5 +278,10 @@ public class AudioModule implements Runnable {
         }
         return out;
     }
+
+    //method that changes teh takeScreenshot boolean to take the screenshot and save it
+    public void saveImage() {
+        loader.takeScreenshot = true;
+    }
     
 }
