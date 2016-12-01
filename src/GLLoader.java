@@ -172,15 +172,15 @@ public class GLLoader implements Runnable{
 			audioProc();
 			draw();	
 			frame++;
-			if(frame%2==0){
+			if(frame%2==0 && mode !=1){
 				alphaFiller();
 			}
 			if(frame%3==0){
-				if(algo!=0){
+				if(algo!=0 && mode!=1){
 					fadeout();
 				}
 			}
-			if(algo==3){
+			if(algo==3 && mode != 1){
 				if(frame % 15 == 0){
 					trigger =true;
 					arrayFillerWiggle();
