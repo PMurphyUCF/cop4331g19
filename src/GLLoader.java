@@ -573,13 +573,9 @@ public class GLLoader implements Runnable{
 		if(staticEnded==false){
 			arrayFillerJump(x,y,Magnitude);
 		}	
-
-		
-		else{
-			colorChannelsActive[x][y].r = (colorChannelsActive[x][y].r + Color.r)/2;
-			colorChannelsActive[x][y].g = (colorChannelsActive[x][y].g + Color.g)/2;
-			colorChannelsActive[x][y].b = (colorChannelsActive[x][y].b + Color.b)/2;		
-		}
+		colorChannelsActive[x][y].r = (colorChannelsActive[x][y].r + Color.r)/2;
+		colorChannelsActive[x][y].g = (colorChannelsActive[x][y].g + Color.g)/2;
+		colorChannelsActive[x][y].b = (colorChannelsActive[x][y].b + Color.b)/2;		
 		errorChecking[x][y]=true;
 		Magnitude--;
 		for(int i=0; i<4; i++)
@@ -733,8 +729,8 @@ public class GLLoader implements Runnable{
 						pointerA=0;
 					}
 					//System.out.printf("%d %d %d ",pointerA,pointMapper[pointerA].x, pointMapper[pointerA].y);
-						colorCrawler3(pointMapper[pointerA].x,pointMapper[pointerA].y,AudioData[a],colorChannels[pointMapper[pointerA].x][pointMapper[pointerA].y]);
-						boolreset();			
+					colorCrawler3(pointMapper[pointerA].x,pointMapper[pointerA].y,AudioData[a],colorChannels[pointMapper[pointerA].x][pointMapper[pointerA].y]);
+					boolreset();			
 				}
 			}		
 			for(int i=0;i<xArrayVal;i++){
