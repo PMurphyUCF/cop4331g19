@@ -41,11 +41,11 @@ public class noise
 	private static short permMod12[] = new short[512];
 	static 
 	{
-	for(int i=0; i<512; i++)
-	{
-	perm[i]=p[i & 255];
-	permMod12[i] = (short)(perm[i] % 12);
-	}
+		for(int i=0; i<512; i++)
+		{
+			perm[i]=p[i & 255];
+			permMod12[i] = (short)(perm[i] % 12);
+		}
 	}
 	
 	// Skewing and unskewing factors for 2, 3, and 4 dimensions
@@ -55,33 +55,33 @@ public class noise
 	// This method is a *lot* faster than using (int)Math.floor(x)
 	private static int fastfloor(double x)
 	{
-	int xi = (int)x;
-	return x<xi ? xi-1 : xi;
+		int xi = (int)x;
+		return x<xi ? xi-1 : xi;
 	}
 	
 	private static double dot(Grad g, double x, double y)
 	{
-	return g.x*x + g.y*y;
+		return g.x*x + g.y*y;
 	}
 		
 	// 2D simplex noise
 	public static float noise(int xinput, int yinput)
 	{
-	double xin = xinput;
-	double yin = yinput;
-	double n0, n1, n2; // Noise contributions from the three corners
-	// Skew the input space to determine which simplex cell we're in
-	double s = (xin+yin)*F2; // Hairy factor for 2D
-	int i = fastfloor(xin+s);
-	int j = fastfloor(yin+s);
-	double t = (i+j)*G2;
-	double X0 = i-t; // Unskew the cell origin back to (x,y) space
-	double Y0 = j-t;
-	double x0 = xin-X0; // The x,y distances from the cell origin
-	double y0 = yin-Y0;
-	// For the 2D case, the simplex shape is an equilateral triangle.
-	// Determine which simplex we are in.
-	int i1, j1; // Offsets for second (middle) corner of simplex in (i,j) coords
+		double xin = xinput;
+		double yin = yinput;
+		double n0, n1, n2; // Noise contributions from the three corners
+		// Skew the input space to determine which simplex cell we're in
+		double s = (xin+yin)*F2; // Hairy factor for 2D
+		int i = fastfloor(xin+s);
+		int j = fastfloor(yin+s);
+		double t = (i+j)*G2;
+		double X0 = i-t; // Unskew the cell origin back to (x,y) space
+		double Y0 = j-t;
+		double x0 = xin-X0; // The x,y distances from the cell origin
+		double y0 = yin-Y0;
+		// For the 2D case, the simplex shape is an equilateral triangle.
+		// Determine which simplex we are in.
+		int i1, j1; // Offsets for second (middle) corner of simplex in (i,j) coords
 	if(x0>y0)
 	{
 		i1=1; j1=0;
@@ -108,22 +108,22 @@ public class noise
 	if(t0<0) n0 = 0.0;
 	else 
 	{
-	t0 *= t0;
-	n0 = t0 * t0 * dot(grad3[gi0], x0, y0);  // (x,y) of grad3 used for 2D gradient
+		t0 *= t0;
+		n0 = t0 * t0 * dot(grad3[gi0], x0, y0);  // (x,y) of grad3 used for 2D gradient
 	}
 	double t1 = 0.5 - x1*x1-y1*y1;
 	if(t1<0) n1 = 0.0;
 	else 
 	{
-	t1 *= t1;
-	n1 = t1 * t1 * dot(grad3[gi1], x1, y1);
+		t1 *= t1;
+		n1 = t1 * t1 * dot(grad3[gi1], x1, y1);
 	}
 	double t2 = 0.5 - x2*x2-y2*y2;
 	if(t2<0) n2 = 0.0;
 	else 
 	{
-	t2 *= t2;
-	n2 = t2 * t2 * dot(grad3[gi2], x2, y2);
+		t2 *= t2;
+		n2 = t2 * t2 * dot(grad3[gi2], x2, y2);
 	}
 	// Add contributions from each corner to get the final noise value.
 	// The result is scaled to return values in the interval [-1,1].

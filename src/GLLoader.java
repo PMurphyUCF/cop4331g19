@@ -35,6 +35,7 @@ public class GLLoader implements Runnable{
 	private volatile boolean running = true;
 	private quaddata storage[][];
 	private quaddata wiggle[][];
+	private quaddata jump[][];
 	private float alphaChannels[][] = new float[xArrayVal][yArrayVal];
 	private colorquad colorChannels[][] = new colorquad[xArrayVal][yArrayVal];
 	private colorquad colorChannelsActive[][] = new colorquad[xArrayVal][yArrayVal];
@@ -301,7 +302,7 @@ public class GLLoader implements Runnable{
 			}
 			break;
 			case 3:
-			glClearColor(0.0f, 0.5f, 0.5f, 1.0f);
+			glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 			for(int a=0;a<512;a++){
 				if(AudioData[a]!=0){
 					rand = (int) Math.floor(Math.random() * 2) -1;
@@ -313,7 +314,7 @@ public class GLLoader implements Runnable{
 						pointerA=0;
 					}
 					//System.out.printf("%d %d %d ",pointerA,pointMapper[pointerA].x, pointMapper[pointerA].y);
-					colorCrawler2(pointMapper[pointerA].x,pointMapper[pointerA].y,AudioData[a],colorChannels[pointMapper[pointerA].x][pointMapper[pointerA].y]);
+					colorCrawler3(pointMapper[pointerA].x,pointMapper[pointerA].y,AudioData[a],colorChannels[pointMapper[pointerA].x][pointMapper[pointerA].y]);
 					boolreset();
 				}
 			}		
@@ -321,13 +322,14 @@ public class GLLoader implements Runnable{
 				for(int k=0;k<yArrayVal;k++){
 					glBegin(GL_QUADS);
 					glColor4f(colorChannelsActive[i][k].r,colorChannelsActive[i][k].g,colorChannelsActive[i][k].b,alphaChannels[i][k]);
-			        glVertex2i((storage[i][k].bl.x+wiggle[i][k].bl.x)/2,(storage[i][k].bl.y+wiggle[i][k].bl.y)/2); //bottom-left vertex
-			        glVertex2i((storage[i][k].br.x+wiggle[i][k].br.x)/2,(storage[i][k].br.y+wiggle[i][k].br.y)/2); //bottom-right vertex
-			        glVertex2i((storage[i][k].tr.x+wiggle[i][k].tr.x)/2,(storage[i][k].tr.y+wiggle[i][k].tr.y)/2); //top-right vertex
-			        glVertex2i((storage[i][k].tl.x+wiggle[i][k].tl.x)/2,(storage[i][k].tl.y+wiggle[i][k].tl.y)/2); //top-left vertex
+			        glVertex2i((storage[i][k].bl.x+wiggle[i][k].bl.x+jump[i][k].bl.x)/3,(storage[i][k].bl.y+wiggle[i][k].bl.y+jump[i][k].bl.y)/3); //bottom-left vertex
+			        glVertex2i((storage[i][k].br.x+wiggle[i][k].br.x+jump[i][k].br.x)/3,(storage[i][k].br.y+wiggle[i][k].br.y+jump[i][k].br.y)/3); //bottom-right vertex
+			        glVertex2i((storage[i][k].tr.x+wiggle[i][k].tr.x+jump[i][k].tr.x)/3,(storage[i][k].tr.y+wiggle[i][k].tr.y+jump[i][k].tr.y)/3); //top-right vertex
+			        glVertex2i((storage[i][k].tl.x+wiggle[i][k].tl.x+jump[i][k].tl.x)/3,(storage[i][k].tl.y+wiggle[i][k].tl.y+jump[i][k].tl.y)/3); //top-left vertex
 			        glEnd();
 				}
 			}
+			arrayJumpReset();
 			break;
 			
 			
@@ -352,6 +354,7 @@ public class GLLoader implements Runnable{
 	private void arrayFiller(){
 		storage = new quaddata[xArrayVal][yArrayVal];
 		wiggle = new quaddata[xArrayVal][yArrayVal];
+		jump = new quaddata[xArrayVal][yArrayVal];
 		pointMapper = new point[xArrayVal*yArrayVal];
 		int SIZE=16; 
 		int PADDING_HALF=2;	
@@ -370,6 +373,7 @@ public class GLLoader implements Runnable{
 				tracker++;
 				storage[i][k] = new quaddata();
 				wiggle [i][k] = new quaddata();
+				jump [i][k] = new quaddata();
 		        storage[i][k].bl.x = SIZE*(x-1) + PADDING_HALF;
 		        storage[i][k].bl.y = SIZE*(y-1) + PADDING_HALF;
 		       
@@ -393,6 +397,18 @@ public class GLLoader implements Runnable{
 		        
 		        wiggle[i][k].tl.x = SIZE*(x-1) + PADDING_HALF;
 		        wiggle[i][k].tl.y = SIZE*y - PADDING_HALF;
+		        
+		        jump[i][k].bl.x = SIZE*(x-1) + PADDING_HALF;
+		        jump[i][k].bl.y = SIZE*(y-1) + PADDING_HALF;
+		       
+		        jump[i][k].br.x = SIZE*x - PADDING_HALF;
+		        jump[i][k].br.y = SIZE*(y-1) + PADDING_HALF;
+		        
+		        jump[i][k].tr.x = SIZE*x - PADDING_HALF;
+		        jump[i][k].tr.y = SIZE*y - PADDING_HALF;
+		        
+		        jump[i][k].tl.x = SIZE*(x-1) + PADDING_HALF;
+		        jump[i][k].tl.y = SIZE*y - PADDING_HALF;
 			}
 		}
 	}
@@ -403,13 +419,11 @@ public class GLLoader implements Runnable{
 		int PADDING_HALF=2;	
 		int x=0;
 		int y=0;
-		int tracker=0;
 		for(int i=0;i<xArrayVal;i++){
 			x++;
 			y=0;
 			for(int k=0;k<yArrayVal;k++){
 				y++;
-				tracker++;
 				wiggle[i][k].bl.x = SIZE*(x-1) + PADDING_HALF + Random.nextInt(4);
 				wiggle[i][k].bl.y = SIZE*(y-1) + PADDING_HALF + Random.nextInt(4);
 		       
@@ -431,13 +445,11 @@ public class GLLoader implements Runnable{
 		int PADDING_HALF=2;	
 		int x=0;
 		int y=0;
-		int tracker=0;
 		for(int i=0;i<xArrayVal;i++){
 			x++;
 			y=0;
 			for(int k=0;k<yArrayVal;k++){
 				y++;
-				tracker++;
 				wiggle[i][k].bl.x = SIZE*(x-1) + PADDING_HALF;
 				wiggle[i][k].bl.y = SIZE*(y-1) + PADDING_HALF;
 		       
@@ -454,6 +466,48 @@ public class GLLoader implements Runnable{
 		}
 	}
 	
+	private void arrayFillerJump(int i, int k, int jumper){
+		int SIZE=16; 
+		int PADDING_HALF=2;	
+		jump[i][k].bl.x = SIZE*(i-1) + PADDING_HALF + jumper*2;
+		jump[i][k].bl.y = SIZE*(k-1) + PADDING_HALF + jumper*2;
+       
+		jump[i][k].br.x = SIZE*i - PADDING_HALF + jumper*2;
+		jump[i][k].br.y = SIZE*(k-1) + PADDING_HALF + jumper*2;
+        
+		jump[i][k].tr.x = SIZE*i - PADDING_HALF + jumper*2;
+		jump[i][k].tr.y = SIZE*k - PADDING_HALF + jumper*2;
+        
+		jump[i][k].tl.x = SIZE*(i-1) + PADDING_HALF + jumper*2;
+		jump[i][k].tl.y = SIZE*k - PADDING_HALF + jumper*2;		
+		
+	}
+	
+	private void arrayJumpReset(){
+		int SIZE=16; 
+		int PADDING_HALF=2;	
+		int x=0;
+		int y=0;
+		for(int i=0;i<xArrayVal;i++){
+			x++;
+			y=0;
+			for(int k=0;k<yArrayVal;k++){
+				y++;
+				jump[i][k].bl.x = SIZE*(x-1) + PADDING_HALF;
+				jump[i][k].bl.y = SIZE*(y-1) + PADDING_HALF;
+		       
+				jump[i][k].br.x = SIZE*x - PADDING_HALF;
+				jump[i][k].br.y = SIZE*(y-1) + PADDING_HALF;
+		        
+				jump[i][k].tr.x = SIZE*x - PADDING_HALF;
+				jump[i][k].tr.y = SIZE*y - PADDING_HALF;
+		        
+				jump[i][k].tl.x = SIZE*(x-1) + PADDING_HALF;
+				jump[i][k].tl.y = SIZE*y - PADDING_HALF;
+		      
+			}
+		}
+	}
 	private void colorCrawler (int x, int y, int Magnitude, colorquad Color){
 		if(Magnitude <=0){
 			return;
@@ -509,6 +563,38 @@ public class GLLoader implements Runnable{
 		return;
 	}
 	
+	private void colorCrawler3 (int x, int y, int Magnitude, colorquad Color){
+		if(Magnitude <=0 || errorChecking[x][y]==true){
+			return;
+		}
+		//System.out.printf("%d ", Magnitude);
+		int ytemp;
+		int xtemp;
+		arrayFillerJump(x,y,Magnitude);
+		if(colorChannelsActive[x][y].r >= 1.0f && colorChannelsActive[x][y].g >= 1.0f && colorChannelsActive[x][y].b >= 1.0f){
+			colorChannelsActive[x][y].r = Color.r;
+			colorChannelsActive[x][y].g = Color.g;
+			colorChannelsActive[x][y].b = Color.b;
+		}
+		else{
+			colorChannelsActive[x][y].r = (colorChannelsActive[x][y].r + Color.r)/2;
+			colorChannelsActive[x][y].g = (colorChannelsActive[x][y].g + Color.g)/2;
+			colorChannelsActive[x][y].b = (colorChannelsActive[x][y].b + Color.b)/2;		
+		}
+		errorChecking[x][y]=true;
+		Magnitude--;
+		for(int i=0; i<4; i++)
+		{	
+			xtemp = x+xmove[i];
+			ytemp = y+ymove[i];
+			
+			if (!((xtemp <0) || (xtemp>(xArrayVal-1)) || (ytemp <0) || (ytemp>(yArrayVal-1))))
+			{						
+				colorCrawler3(xtemp, ytemp, Magnitude, Color);
+			}
+		}
+		return;
+	}
 	
 	private void fadeout(){
 		switch (algo){
@@ -569,17 +655,17 @@ public class GLLoader implements Runnable{
 		case 3:
 			for(int i=0;i<xArrayVal;i++){
 				for(int k=0;k<yArrayVal;k++){
-					colorChannelsActive[i][k].r = colorChannelsActive[i][k].r - 0.05f;
-					if(colorChannelsActive[i][k].r<0.0f){
-						colorChannelsActive[i][k].r=0.0f;
+					colorChannelsActive[i][k].r = colorChannelsActive[i][k].r + 0.05f;
+					if(colorChannelsActive[i][k].r>1.0f){
+						colorChannelsActive[i][k].r=1.0f;
 					}
-					colorChannelsActive[i][k].g = colorChannelsActive[i][k].g - 0.05f;
-					if(colorChannelsActive[i][k].g<0.0f){
-						colorChannelsActive[i][k].g=0.0f;
+					colorChannelsActive[i][k].g = colorChannelsActive[i][k].g + 0.05f;
+					if(colorChannelsActive[i][k].g>1.0f){
+						colorChannelsActive[i][k].g=1.0f;
 					}
-					colorChannelsActive[i][k].b = colorChannelsActive[i][k].b - 0.05f;
-					if(colorChannelsActive[i][k].b<0.0f){
-						colorChannelsActive[i][k].b=0.0f;
+					colorChannelsActive[i][k].b = colorChannelsActive[i][k].b + 0.05f;
+					if(colorChannelsActive[i][k].b>1.0f){
+						colorChannelsActive[i][k].b=1.0f;
 					}
 				}
 			}
