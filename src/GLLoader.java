@@ -467,19 +467,19 @@ public class GLLoader implements Runnable{
 	}
 	
 	private void arrayFillerJump(int i, int k, int jumper){
-		int SIZE=16; 
+		int SIZE=16*jumper; 
 		int PADDING_HALF=2;	
-		jump[i][k].bl.x = SIZE*(i-1) + PADDING_HALF + jumper*2;
-		jump[i][k].bl.y = SIZE*(k-1) + PADDING_HALF + jumper*2;
+		jump[i][k].bl.x = SIZE*(i-1) + PADDING_HALF + jumper;
+		jump[i][k].bl.y = SIZE*(k-1) + PADDING_HALF + jumper;
        
-		jump[i][k].br.x = SIZE*i - PADDING_HALF + jumper*2;
-		jump[i][k].br.y = SIZE*(k-1) + PADDING_HALF + jumper*2;
+		jump[i][k].br.x = SIZE*i - PADDING_HALF + jumper;
+		jump[i][k].br.y = SIZE*(k-1) + PADDING_HALF + jumper;
         
-		jump[i][k].tr.x = SIZE*i - PADDING_HALF + jumper*2;
-		jump[i][k].tr.y = SIZE*k - PADDING_HALF + jumper*2;
+		jump[i][k].tr.x = SIZE*i - PADDING_HALF + jumper;
+		jump[i][k].tr.y = SIZE*k - PADDING_HALF + jumper;
         
-		jump[i][k].tl.x = SIZE*(i-1) + PADDING_HALF + jumper*2;
-		jump[i][k].tl.y = SIZE*k - PADDING_HALF + jumper*2;		
+		jump[i][k].tl.x = SIZE*(i-1) + PADDING_HALF + jumper;
+		jump[i][k].tl.y = SIZE*k - PADDING_HALF + jumper;		
 		
 	}
 	
@@ -493,17 +493,17 @@ public class GLLoader implements Runnable{
 			y=0;
 			for(int k=0;k<yArrayVal;k++){
 				y++;
-				jump[i][k].bl.x = SIZE*(x-1) + PADDING_HALF;
-				jump[i][k].bl.y = SIZE*(y-1) + PADDING_HALF;
+				jump[i][k].bl.x = (SIZE*(x-1) + PADDING_HALF + jump[i][k].bl.x)/2;
+				jump[i][k].bl.y = (SIZE*(y-1) + PADDING_HALF + jump[i][k].bl.y)/2;
 		       
-				jump[i][k].br.x = SIZE*x - PADDING_HALF;
-				jump[i][k].br.y = SIZE*(y-1) + PADDING_HALF;
+				jump[i][k].br.x = (SIZE*x - PADDING_HALF + jump[i][k].br.x)/2;
+				jump[i][k].br.y = (SIZE*(y-1) + PADDING_HALF + jump[i][k].br.y)/2;
 		        
-				jump[i][k].tr.x = SIZE*x - PADDING_HALF;
-				jump[i][k].tr.y = SIZE*y - PADDING_HALF;
+				jump[i][k].tr.x = (SIZE*x - PADDING_HALF + jump[i][k].tr.x)/2;
+				jump[i][k].tr.y = (SIZE*y - PADDING_HALF + jump[i][k].tr.y)/2;
 		        
-				jump[i][k].tl.x = SIZE*(x-1) + PADDING_HALF;
-				jump[i][k].tl.y = SIZE*y - PADDING_HALF;
+				jump[i][k].tl.x = (SIZE*(x-1) + PADDING_HALF + jump[i][k].tl.x)/2;
+				jump[i][k].tl.y =(SIZE*y - PADDING_HALF + jump[i][k].tl.y)/2;
 		      
 			}
 		}
