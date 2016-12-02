@@ -303,6 +303,9 @@ public class GLLoader implements Runnable{
 			break;
 			case 3:
 			glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+			if(mode==1){
+				activeColors(1.0f,1.0f,1.0f);
+			}
 			for(int a=0;a<512;a++){
 				if(AudioData[a]!=0){
 					rand = (int) Math.floor(Math.random() * 2) -1;
@@ -321,12 +324,22 @@ public class GLLoader implements Runnable{
 			for(int i=0;i<xArrayVal;i++){
 				for(int k=0;k<yArrayVal;k++){
 					glBegin(GL_QUADS);
-					glColor4f(colorChannelsActive[i][k].r,colorChannelsActive[i][k].g,colorChannelsActive[i][k].b,alphaChannels[i][k]);
-			        glVertex2i((storage[i][k].bl.x+wiggle[i][k].bl.x+jump[i][k].bl.x)/3,(storage[i][k].bl.y+wiggle[i][k].bl.y+jump[i][k].bl.y)/3); //bottom-left vertex
-			        glVertex2i((storage[i][k].br.x+wiggle[i][k].br.x+jump[i][k].br.x)/3,(storage[i][k].br.y+wiggle[i][k].br.y+jump[i][k].br.y)/3); //bottom-right vertex
-			        glVertex2i((storage[i][k].tr.x+wiggle[i][k].tr.x+jump[i][k].tr.x)/3,(storage[i][k].tr.y+wiggle[i][k].tr.y+jump[i][k].tr.y)/3); //top-right vertex
-			        glVertex2i((storage[i][k].tl.x+wiggle[i][k].tl.x+jump[i][k].tl.x)/3,(storage[i][k].tl.y+wiggle[i][k].tl.y+jump[i][k].tl.y)/3); //top-left vertex
-			        glEnd();
+					if(mode!=1){
+						glColor4f(colorChannelsActive[i][k].r,colorChannelsActive[i][k].g,colorChannelsActive[i][k].b,alphaChannels[i][k]);
+						glVertex2i((storage[i][k].bl.x+wiggle[i][k].bl.x+jump[i][k].bl.x)/3,(storage[i][k].bl.y+wiggle[i][k].bl.y+jump[i][k].bl.y)/3); //bottom-left vertex
+				        glVertex2i((storage[i][k].br.x+wiggle[i][k].br.x+jump[i][k].br.x)/3,(storage[i][k].br.y+wiggle[i][k].br.y+jump[i][k].br.y)/3); //bottom-right vertex
+				        glVertex2i((storage[i][k].tr.x+wiggle[i][k].tr.x+jump[i][k].tr.x)/3,(storage[i][k].tr.y+wiggle[i][k].tr.y+jump[i][k].tr.y)/3); //top-right vertex
+				        glVertex2i((storage[i][k].tl.x+wiggle[i][k].tl.x+jump[i][k].tl.x)/3,(storage[i][k].tl.y+wiggle[i][k].tl.y+jump[i][k].tl.y)/3); //top-left vertex
+				        glEnd();
+					}
+					else{
+						glColor4f(colorChannelsActive[i][k].r,colorChannelsActive[i][k].g,colorChannelsActive[i][k].b,alphaChannels[i][k]);
+				        glVertex2i(storage[i][k].bl.x,storage[i][k].bl.y); //bottom-left vertex
+				        glVertex2i(storage[i][k].br.x, storage[i][k].br.y); //bottom-right vertex
+				        glVertex2i(storage[i][k].tr.x, storage[i][k].tr.y); //top-right vertex
+				        glVertex2i(storage[i][k].tl.x, storage[i][k].tl.y); //top-left vertex
+				        glEnd();
+					}
 				}
 			}
 			arrayJumpReset();
@@ -340,6 +353,16 @@ public class GLLoader implements Runnable{
 		glDisable(GL_BLEND);
 		glfwSwapBuffers(window);
 		glfwPollEvents();	
+	}
+	
+	private void activeColors (float r,float g,float b){
+		for(int i=0;i<xArrayVal;i++){
+			for(int k=0;k<yArrayVal;k++){			
+					colorChannelsActive[i][k].r=r;				
+					colorChannelsActive[i][k].g=g;		
+					colorChannelsActive[i][k].b=b;			
+			}
+		}
 	}
 	
 	private void boolreset(){
@@ -1014,11 +1037,12 @@ public class GLLoader implements Runnable{
 	private void alphaFiller(){
 		float alpha;
 		Random Random = new Random() ;
+		Noise noise = new Noise();
 		switch (algo){
 		case 0:
 			for(int i =0; i<xArrayVal; i++){
 				for(int k=0; k<yArrayVal;k++){
-					int seed = Random.nextInt(1000);
+					int seed = Random.nextInt(1000);			
 					alpha = alphaChannels[i][k]  + noise.noise(i+seed,k+seed)/8;
 					if(alpha >= 1.0f || alpha <= 0.0f ){
 						alphaChannels[i][k] = 1.0f;
