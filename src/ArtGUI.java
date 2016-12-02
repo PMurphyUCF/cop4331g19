@@ -1,4 +1,3 @@
-import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Enumeration;
@@ -7,6 +6,10 @@ import javax.swing.*;
 
 public class ArtGUI extends JApplet implements ActionListener, WindowListener {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -1348153619396853235L;
 	//false when not recording, true when recording
 	public static boolean recordState = false;
 	public static JButton recordInput, savePngImage, saveJpgImage;

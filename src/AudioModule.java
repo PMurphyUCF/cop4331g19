@@ -1,14 +1,13 @@
-import org.jtransforms.fft.DoubleFFT_1D;
-
-import javax.sound.sampled.*;
-
-import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
-import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
-import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
-import static org.lwjgl.glfw.GLFW.glfwTerminate;
-
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
+
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Line;
+import javax.sound.sampled.Mixer;
+import javax.sound.sampled.TargetDataLine;
+
+import org.jtransforms.fft.DoubleFFT_1D;
 
 
 public class AudioModule implements Runnable {
