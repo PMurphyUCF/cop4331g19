@@ -49,7 +49,7 @@ public class ArtGUI extends JApplet implements ActionListener, WindowListener {
 	{ }
 
 	public void init(){
-		frame.addWindowListener(this);
+		//frame.addWindowListener(this);
 		recordState = false;
 		module = new AudioModule();
 
