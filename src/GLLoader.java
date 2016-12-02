@@ -570,12 +570,11 @@ public class GLLoader implements Runnable{
 		//System.out.printf("%d ", Magnitude);
 		int ytemp;
 		int xtemp;
-		arrayFillerJump(x,y,Magnitude);
-		if(colorChannelsActive[x][y].r >= 1.0f && colorChannelsActive[x][y].g >= 1.0f && colorChannelsActive[x][y].b >= 1.0f){
-			colorChannelsActive[x][y].r = Color.r;
-			colorChannelsActive[x][y].g = Color.g;
-			colorChannelsActive[x][y].b = Color.b;
-		}
+		if(staticEnded==false){
+			arrayFillerJump(x,y,Magnitude);
+		}	
+
+		
 		else{
 			colorChannelsActive[x][y].r = (colorChannelsActive[x][y].r + Color.r)/2;
 			colorChannelsActive[x][y].g = (colorChannelsActive[x][y].g + Color.g)/2;
@@ -734,8 +733,8 @@ public class GLLoader implements Runnable{
 						pointerA=0;
 					}
 					//System.out.printf("%d %d %d ",pointerA,pointMapper[pointerA].x, pointMapper[pointerA].y);
-					colorCrawler3(pointMapper[pointerA].x,pointMapper[pointerA].y,AudioData[a],colorChannels[pointMapper[pointerA].x][pointMapper[pointerA].y]);
-					boolreset();
+						colorCrawler3(pointMapper[pointerA].x,pointMapper[pointerA].y,AudioData[a],colorChannels[pointMapper[pointerA].x][pointMapper[pointerA].y]);
+						boolreset();			
 				}
 			}		
 			for(int i=0;i<xArrayVal;i++){
@@ -759,7 +758,9 @@ public class GLLoader implements Runnable{
 					}
 				}
 			}
-			arrayJumpReset();
+			if(staticEnded==false){
+				arrayJumpReset();
+			}
 			break;
 			
 			
@@ -829,21 +830,23 @@ public class GLLoader implements Runnable{
 			}
 			break;	
 		case 3:
-			for(int i=0;i<xArrayVal;i++){
-				for(int k=0;k<yArrayVal;k++){
-					colorChannelsActive[i][k].r = colorChannelsActive[i][k].r + 0.05f;
-					if(colorChannelsActive[i][k].r>1.0f){
-						colorChannelsActive[i][k].r=1.0f;
+			if(staticEnded==false){
+				for(int i=0;i<xArrayVal;i++){
+					for(int k=0;k<yArrayVal;k++){
+						colorChannelsActive[i][k].r = colorChannelsActive[i][k].r + 0.05f;
+						if(colorChannelsActive[i][k].r>1.0f){
+							colorChannelsActive[i][k].r=1.0f;
+						}
+						colorChannelsActive[i][k].g = colorChannelsActive[i][k].g + 0.05f;
+						if(colorChannelsActive[i][k].g>1.0f){
+							colorChannelsActive[i][k].g=1.0f;
+						}
+						colorChannelsActive[i][k].b = colorChannelsActive[i][k].b + 0.05f;
+						if(colorChannelsActive[i][k].b>1.0f){
+							colorChannelsActive[i][k].b=1.0f;
+						}
 					}
-					colorChannelsActive[i][k].g = colorChannelsActive[i][k].g + 0.05f;
-					if(colorChannelsActive[i][k].g>1.0f){
-						colorChannelsActive[i][k].g=1.0f;
-					}
-					colorChannelsActive[i][k].b = colorChannelsActive[i][k].b + 0.05f;
-					if(colorChannelsActive[i][k].b>1.0f){
-						colorChannelsActive[i][k].b=1.0f;
-					}
-				}
+				}	
 			}
 			break;
 		}
