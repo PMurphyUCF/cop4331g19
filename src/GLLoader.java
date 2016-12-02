@@ -106,7 +106,7 @@ public class GLLoader implements Runnable{
 	private int xArrayVal =64;
 	private int yArrayVal =32;
 	public int width = 0, height = 0, algo = 0, mode = 0;
-	public boolean fullscreen = false, takeScreenshot = false;
+	public boolean fullscreen = false, takeScreenshot = false, staticEnded = false;
 	public String format;
 	private volatile boolean running = true;
 	private quaddata storage[][];

@@ -113,6 +113,7 @@ public class AudioModule implements Runnable {
                     //System.out.println(dub/max);
                 }
             }
+            loader.staticEnded = true;
             System.out.println(index + " static data points");
 
             //send on over the staticData array to be used to make purrty visual stuff

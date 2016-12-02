@@ -3,7 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="9e5f608e-1043-44df-899e-0d4b5425a463" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ArtGUI.java" afterPath="$PROJECT_DIR$/src/ArtGUI.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/AudioModule.java" afterPath="$PROJECT_DIR$/src/AudioModule.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/GLLoader.java" afterPath="$PROJECT_DIR$/src/GLLoader.java" />
     </list>
     <ignored path="cop4331g19.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -24,11 +25,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="ArtGUI.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ArtGUI.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ArtGUI.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="867">
-              <caret line="51" column="10" selection-start-line="51" selection-start-column="10" selection-end-line="51" selection-end-column="10" />
+            <state relative-caret-position="272">
+              <caret line="67" column="27" selection-start-line="67" selection-start-column="27" selection-end-line="67" selection-end-column="27" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -39,18 +40,18 @@
       <file leaf-file-name="AudioModule.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/AudioModule.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="45" column="36" selection-start-line="45" selection-start-column="36" selection-end-line="45" selection-end-column="36" />
+            <state relative-caret-position="306">
+              <caret line="115" column="38" selection-start-line="115" selection-start-column="38" selection-end-line="115" selection-end-column="38" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GLLoader.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="GLLoader.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/GLLoader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="8415">
-              <caret line="519" column="52" selection-start-line="519" selection-start-column="52" selection-end-line="519" selection-end-column="52" />
+            <state relative-caret-position="-376">
+              <caret line="108" column="82" selection-start-line="108" selection-start-column="82" selection-end-line="108" selection-end-column="82" />
               <folding />
             </state>
           </provider>
@@ -79,9 +80,9 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
+        <option value="$PROJECT_DIR$/src/ArtGUI.java" />
         <option value="$PROJECT_DIR$/src/GLLoader.java" />
         <option value="$PROJECT_DIR$/src/AudioModule.java" />
-        <option value="$PROJECT_DIR$/src/ArtGUI.java" />
       </list>
     </option>
   </component>
@@ -172,6 +173,10 @@
   <component name="PropertiesComponent">
     <property name="settings.editor.selected.configurable" value="editor.preferences.import" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
+    <property name="GenerateAntBuildDialog.enableUiFormCompile" value="true" />
+    <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
+    <property name="GenerateAntBuildDialog.backupFiles" value="true" />
+    <property name="GenerateAntBuildDialog.outputFileNameProperty" value="cop4331g19" />
   </component>
   <component name="RunManager" selected="Applet.ArtGUI">
     <configuration default="false" name="ArtGUI" type="Applet" factoryName="Applet" temporary="true">
@@ -660,29 +665,29 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/GLLoader.java">
+    <entry file="file://$PROJECT_DIR$/src/ArtGUI.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8415">
-          <caret line="519" column="52" selection-start-line="519" selection-start-column="52" selection-end-line="519" selection-end-column="52" />
-          <folding />
+        <state relative-caret-position="272">
+          <caret line="67" column="27" selection-start-line="67" selection-start-column="27" selection-end-line="67" selection-end-column="27" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/AudioModule.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="45" column="36" selection-start-line="45" selection-start-column="36" selection-end-line="45" selection-end-column="36" />
+        <state relative-caret-position="306">
+          <caret line="115" column="38" selection-start-line="115" selection-start-column="38" selection-end-line="115" selection-end-column="38" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ArtGUI.java">
+    <entry file="file://$PROJECT_DIR$/src/GLLoader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="867">
-          <caret line="51" column="10" selection-start-line="51" selection-start-column="10" selection-end-line="51" selection-end-column="10" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="-376">
+          <caret line="108" column="82" selection-start-line="108" selection-start-column="82" selection-end-line="108" selection-end-column="82" />
+          <folding />
         </state>
       </provider>
     </entry>
