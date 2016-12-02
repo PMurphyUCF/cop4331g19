@@ -5,7 +5,7 @@ import java.util.Enumeration;
 
 import javax.swing.*;
 
-public class ArtGUI extends JApplet implements ActionListener {
+public class ArtGUI extends JApplet implements ActionListener, WindowListener {
 
 	//false when not recording, true when recording
 	public static boolean recordState = false;
@@ -16,12 +16,40 @@ public class ArtGUI extends JApplet implements ActionListener {
 	private AudioModule module;
 	private Thread audioThread;
 	private JPanel centerPanel;
+	public static Frame frame = null;
 	
-	public void main(String[] args) {
-		init();
+	public static void main(String[] args) {
+		frame = new Frame("SoundVisualizer");
+		ArtGUI app = new ArtGUI();
+		frame.add(app);	
+		app.init();
+		app.start();
+		frame.pack();
+		frame.setLocation(100,100);
+		frame.setSize(770,560);
+		frame.setVisible(true);
+		
 	}
-	
+	public void windowClosing(WindowEvent e)
+	{
+		frame.dispose();
+		System.exit(0);
+	}
+	public void windowOpened(WindowEvent e)
+	{ }
+	public void windowIconified(WindowEvent e)
+	{ }
+	public void windowClosed(WindowEvent e)
+	{ }
+	public void windowDeiconified(WindowEvent e)
+	{ }
+	public void windowActivated(WindowEvent e)
+	{ }
+	public void windowDeactivated(WindowEvent e)
+	{ }
+
 	public void init(){
+		frame.addWindowListener(this);
 		recordState = false;
 		module = new AudioModule();
 
