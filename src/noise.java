@@ -1,5 +1,5 @@
 	
-public class noise
+public class Noise
 {
 	private static class Grad
 	  {
