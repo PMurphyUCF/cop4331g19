@@ -190,10 +190,6 @@ public class ArtGUI extends JApplet implements ActionListener, WindowListener {
 		fileOptions.setMnemonic('F');
 		menuBar.add(fileOptions);
 		
-		//menu for modes
-		JMenu modeOptions = new JMenu("Mode");
-		modeOptions.setMnemonic('M');
-		menuBar.add(modeOptions);
 		
 		setJMenuBar(menuBar);
 		
@@ -204,9 +200,6 @@ public class ArtGUI extends JApplet implements ActionListener, WindowListener {
 		exitOption.addActionListener(new ExitListener());
 		fileOptions.add(exitOption);
 		
-		//menuitems for Mode
-		JMenuItem selectMode = new JMenuItem("Select Operation Mode...",KeyEvent.VK_S);
-		modeOptions.add(selectMode);
 		
 	}
 
